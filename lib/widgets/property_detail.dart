@@ -14,7 +14,7 @@ class PropertyDetail extends StatelessWidget {
     print(propertyValueDetails);
     return Card(
         elevation: 5,
-        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 30.0),
+        margin: EdgeInsets.symmetric(vertical: 10.0),
         child: Padding(
           padding: EdgeInsets.all(10.0),
           child: Column(
@@ -27,6 +27,7 @@ class PropertyDetail extends StatelessWidget {
                 thickness: 2,
               ),
               Container(
+                width: MediaQuery.of(context).size.width * 0.7,
                 height: propertyKeyDetails.length.toDouble() * 28,
                 child: ListView.builder(
                     itemBuilder: (ctx, index) => Padding(

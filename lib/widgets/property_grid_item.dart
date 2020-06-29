@@ -2,7 +2,6 @@ import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_page_transition/flutter_page_transition.dart';
 
 class ScreenArguments {}
 
