@@ -118,7 +118,8 @@ class PropertyDetailsScreen extends StatelessWidget {
                                   left: 30.0,
                                   right: 30.0,
                                   bottom: 40.0),
-                              child: Padding(
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.75,
                                 padding: EdgeInsets.all(10.0),
                                 child: Column(
                                   children: <Widget>[

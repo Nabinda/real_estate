@@ -1,5 +1,8 @@
 import 'package:bellasareas/model/property.dart';
+import 'package:bellasareas/provider/category_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
+import 'package:bellasareas/widgets/category_dropdown.dart';
+import 'package:bellasareas/widgets/district_dropdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -30,10 +33,6 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  List<String> categories = ["All", "Lands", "Buildings"];
-  String selectedCategory = "All";
-  List<String> locations = ["All", "Kathmandu", "Pokhara", "Butwal"];
-  String selectedLocation = "Kathmandu";
   List<String> priceRange = [
     "All",
     "1000000-1500000",
@@ -45,9 +44,11 @@ class _SearchScreenState extends State<SearchScreen> {
   double yOffSet = 0;
   double scaleFactor = 1;
   bool isDrawerOpen = false;
-  bool isSearch = false;
+  bool isSearch = true;
   @override
   Widget build(BuildContext context) {
+    String selectedCategory =
+        Provider.of<CategoryProvider>(context).selectedCategory;
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
@@ -116,78 +117,30 @@ class _SearchScreenState extends State<SearchScreen> {
                   children: <Widget>[
                     //--------------DropDown Of Category-------------
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.28,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Category:",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 5),
-                            child: DropdownButton<String>(
-                              items: categories.map((dropdownStringItem) {
-                                return DropdownMenuItem<String>(
-                                  value: dropdownStringItem,
-                                  child: Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                      dropdownStringItem,
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              value: selectedCategory,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedCategory = value;
-                                });
-                              },
+                        width: MediaQuery.of(context).size.width * 0.28,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "Location:",
+                              style: TextStyle(fontSize: 14),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
+                            CategoryDropDown(),
+                          ],
+                        )),
                     //--------------DropDown of Locations-------------
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.28,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Location:",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(left: 2),
-                            child: DropdownButton<String>(
-                              items: locations.map((dropdownStringItem) {
-                                return DropdownMenuItem<String>(
-                                  value: dropdownStringItem,
-                                  child: Expanded(
-                                    flex: 1,
-                                    child: Text(
-                                      dropdownStringItem,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
-                              value: selectedLocation,
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedLocation = value;
-                                });
-                              },
+                        width: MediaQuery.of(context).size.width * 0.28,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              "Location:",
+                              style: TextStyle(fontSize: 14),
                             ),
-                          ),
-                        ],
-                      ),
-                    ),
+                            DistrictDropDown(),
+                          ],
+                        )),
                     //----------DropDown for PriceRange-----------------
                     Expanded(
                       flex: 1,
@@ -248,7 +201,9 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               Divider(),
               isSearch
-                  ? Container()
+                  ? Container(
+                      child: Text(selectedCategory),
+                    )
                   : Center(
                       child: Icon(
                       Icons.search,

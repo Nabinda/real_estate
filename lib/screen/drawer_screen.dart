@@ -1,3 +1,4 @@
+import 'package:bellasareas/screen/edit_add_property_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';
@@ -15,7 +16,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.greenAccent,
+      color: Colors.purple,
       padding: EdgeInsets.only(top: 40, left: 20, bottom: 40),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -110,7 +111,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
               ),
               ListTile(
-                onTap: () {},
+                onTap: () {
+                  Navigator.of(context)
+                      .pushNamed(EditAddPropertyScreen.routeName);
+                },
                 leading: FaIcon(FontAwesomeIcons.landmark),
                 title: Text(
                   "Your Property",

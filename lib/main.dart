@@ -1,5 +1,8 @@
+import 'package:bellasareas/provider/category_provider.dart';
+import 'package:bellasareas/provider/district_provider.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
+import 'package:bellasareas/screen/edit_add_property_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
@@ -21,7 +24,13 @@ class SplashClass extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => PropertyProvider(),
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CategoryProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DistrictProvider(),
+        ),
       ],
       child: MaterialApp(
         theme: ThemeData(
@@ -33,29 +42,9 @@ class SplashClass extends StatelessWidget {
           SearchScreen.routeName: (ctx) => SearchScreenHomePage(),
           LandBuildingScreenHomePage.routeName: (ctx) =>
               LandBuildingScreenHomePage(),
-          PropertyDetailsScreen.routeName: (ctx) => PropertyDetailsScreen()
+          PropertyDetailsScreen.routeName: (ctx) => PropertyDetailsScreen(),
+          EditAddPropertyScreen.routeName: (ctx) => EditAddPropertyScreen(),
         },
-//        onGenerateRoute: (RouteSettings routeSettings) {
-//          return new PageRouteBuilder<dynamic>(
-//              settings: routeSettings,
-//              pageBuilder: (BuildContext context, Animation<double> animation,
-//                  Animation<double> secondaryAnimation) {
-//                switch (routeSettings.name) {
-//                  case "PropertyDetailScreen":
-//                    return PropertyDetailsScreen();
-//                  default:
-//                    return null;
-//                }
-//              },
-//              transitionDuration: const Duration(milliseconds: 300),
-//              transitionsBuilder: (BuildContext context,
-//                  Animation<double> animation,
-//                  Animation<double> secondaryAnimation,
-//                  Widget child) {
-//                return effectMap[PageTransitionType.slideInLeft](
-//                    Curves.easeOutCirc, animation, secondaryAnimation, child);
-//              });
-//        },
       ),
     );
   }
