@@ -41,6 +41,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
   var initValues = {
     "category": "",
     "location": "",
+    "roadAccess": "",
     "images": "",
     "area": "",
     "floor": "",
@@ -69,29 +70,13 @@ class _EditAddPropertyState extends State<EditAddProperty> {
 //-----------------to get image from storage----------
   Future getImage(bool isCamera) async {
     File image;
-    if (images.length <= 4) {
-      if (isCamera) {
-        image = await ImagePicker.pickImage(source: ImageSource.camera);
-      } else {
-        image = await ImagePicker.pickImage(source: ImageSource.gallery);
-      }
+
+    if (isCamera) {
+      image = await ImagePicker.pickImage(source: ImageSource.camera);
     } else {
-      showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: Text("You can upload only 4 photos"),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text("OK"),
-                )
-              ],
-            );
-          });
+      image = await ImagePicker.pickImage(source: ImageSource.gallery);
     }
+
     setState(() {
       images.add(image);
       images != null ? isImage = true : isImage = false;
@@ -163,7 +148,8 @@ class _EditAddPropertyState extends State<EditAddProperty> {
 
   @override
   Widget build(BuildContext context) {
-    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final selectedCategory =
+        Provider.of<CategoryProvider>(context).selectedCategory;
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
@@ -214,154 +200,189 @@ class _EditAddPropertyState extends State<EditAddProperty> {
               height: 10,
             ),
             //-----------------Body Part--------------
-            Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Categories:",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    CategoryDropDown(),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Text(
-                      "Location:",
-                      style: TextStyle(fontSize: 18),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    DistrictDropDown(),
-                  ],
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      height: 150,
-                      width: 200,
-                      child: Expanded(
-                        child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: images.length,
-                            itemBuilder: (ctx, index) => Stack(
-                                  alignment: Alignment.topRight,
-                                  children: <Widget>[
-                                    Container(
-                                      padding: EdgeInsets.all(0.0),
-                                      width: 100,
-                                      height: 150,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                            width: 1, color: Colors.grey),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: Image.file(
-                                        images[index],
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                      ),
-                                    ),
-                                    Positioned(
-                                      top: -10,
-                                      right: -10,
-                                      child: IconButton(
-                                        onPressed: () {
-                                          clearImage(index);
-                                        },
-                                        icon: Icon(
-                                          Icons.clear,
-                                          color: Colors.red,
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                )),
+            IgnorePointer(
+              ignoring: isDrawerOpen,
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Categories:",
+                        style: TextStyle(fontSize: 18),
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        chooseOption(context);
-                      },
-                      child: Container(
-                        child: Icon(Icons.add),
-                        color: Colors.grey,
-                        height: 150,
-                        width: 150,
+                      SizedBox(
+                        width: 10,
                       ),
-                    ),
-                  ],
-                ),
-                Form(
-                  key: _form,
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Column(
-                      children: <Widget>[
-                        Text(
-                          "Images",
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                          decoration: InputDecoration(
-                            labelText: "Area (in anna)",
-                          ),
-                          initialValue: initValues['area'],
-                        ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                          decoration:
-                              InputDecoration(labelText: "Price(in Rs.)"),
-                          initialValue: initValues['price'],
-                        ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                          decoration: InputDecoration(labelText: "Floors"),
-                          initialValue: initValues['floor'],
-                        ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                          decoration: InputDecoration(labelText: "Bathrooms"),
-                          initialValue: initValues['bathroom'],
-                        ),
-                        TextFormField(
-                          keyboardType: TextInputType.number,
-                          style: TextStyle(fontSize: 18),
-                          maxLines: 1,
-                          decoration: InputDecoration(labelText: "Total Rooms"),
-                          initialValue: initValues['bathroom'],
-                        ),
-                      ],
-                    ),
+                      CategoryDropDown(),
+                    ],
                   ),
-                )
-              ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Location:",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      DistrictDropDown(),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Images",
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          chooseOption(context);
+                        },
+                        child: Container(
+                          child: RaisedButton.icon(
+                              onPressed: () {
+                                chooseOption(context);
+                              },
+                              color: Colors.purpleAccent,
+                              label: Text(
+                                "Add",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              icon: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              )),
+                        ),
+                      ),
+                    ],
+                  ),
+                  images.length != 0
+                      ? Container(
+                          height: 150,
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          child: Expanded(
+                            child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: images.length,
+                                itemBuilder: (ctx, index) => Stack(
+                                      alignment: Alignment.topRight,
+                                      children: <Widget>[
+                                        Container(
+                                          padding: EdgeInsets.all(0.0),
+                                          width: 100,
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 1, color: Colors.grey),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: Image.file(
+                                            images[index],
+                                            fit: BoxFit.cover,
+                                            width: double.infinity,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: -10,
+                                          right: -10,
+                                          child: IconButton(
+                                            onPressed: () {
+                                              clearImage(index);
+                                            },
+                                            icon: Icon(
+                                              Icons.clear,
+                                              color: Colors.red,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    )),
+                          ),
+                        )
+                      : Container(),
+                  Form(
+                    key: _form,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.85,
+                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(
+                            height: 5,
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(fontSize: 18),
+                            maxLines: 1,
+                            decoration: InputDecoration(
+                              labelText: "Area (in anna)",
+                            ),
+                            initialValue: initValues['area'],
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(fontSize: 18),
+                            maxLines: 1,
+                            decoration: InputDecoration(
+                                labelText: "Total Price(in Rs.)"),
+                            initialValue: initValues['price'],
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            style: TextStyle(fontSize: 18),
+                            maxLines: 1,
+                            decoration: InputDecoration(
+                                labelText: "Road Access(in km)"),
+                            initialValue: initValues['roadAccess'],
+                          ),
+                          selectedCategory == "Lands"
+                              ? Container()
+                              : Column(
+                                  children: <Widget>[
+                                    TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(fontSize: 18),
+                                      maxLines: 1,
+                                      decoration:
+                                          InputDecoration(labelText: "Floors"),
+                                      initialValue: initValues['floor'],
+                                    ),
+                                    TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(fontSize: 18),
+                                      maxLines: 1,
+                                      decoration: InputDecoration(
+                                          labelText: "Bathrooms"),
+                                      initialValue: initValues['bathroom'],
+                                    ),
+                                    TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(fontSize: 18),
+                                      maxLines: 1,
+                                      decoration: InputDecoration(
+                                          labelText: "Total Rooms"),
+                                      initialValue: initValues['bathroom'],
+                                    ),
+                                  ],
+                                ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
             )
           ],
         ),

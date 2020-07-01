@@ -111,78 +111,71 @@ class _SearchScreenState extends State<SearchScreen> {
           Column(
             children: <Widget>[
               //-----------Search Filters--------------
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    //--------------DropDown Of Category-------------
-                    Container(
-                        width: MediaQuery.of(context).size.width * 0.28,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Location:",
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            CategoryDropDown(),
-                          ],
-                        )),
-                    //--------------DropDown of Locations-------------
-                    Container(
-                        width: MediaQuery.of(context).size.width * 0.28,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Location:",
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            DistrictDropDown(),
-                          ],
-                        )),
-                    //----------DropDown for PriceRange-----------------
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.28,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Price Range:",
-                              style: TextStyle(fontSize: 14),
-                            ),
-                            Container(
-                              padding: EdgeInsets.only(
-                                left: 10,
-                              ),
-                              child: DropdownButton<String>(
-                                items: priceRange.map((dropdownStringItem) {
-                                  return DropdownMenuItem<String>(
-                                    value: dropdownStringItem,
-                                    child: Expanded(
-                                      child: Text(
-                                        dropdownStringItem,
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ),
-                                  );
-                                }).toList(),
-                                value: selectedPriceRange,
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedPriceRange = value;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  //--------------DropDown Of Category-------------
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.28,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Location:",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          CategoryDropDown(),
+                        ],
+                      )),
+                  //--------------DropDown of Locations-------------
+                  Container(
+                      width: MediaQuery.of(context).size.width * 0.28,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Location:",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          DistrictDropDown(),
+                        ],
+                      )),
+                  //----------DropDown for PriceRange-----------------
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.28,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "Price Range:",
+                          style: TextStyle(fontSize: 14),
                         ),
-                      ),
+                        Container(
+                          padding: EdgeInsets.only(
+                            left: 10,
+                          ),
+                          child: DropdownButton<String>(
+                            items: priceRange.map((dropdownStringItem) {
+                              return DropdownMenuItem<String>(
+                                value: dropdownStringItem,
+                                child: Text(
+                                  dropdownStringItem,
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              );
+                            }).toList(),
+                            value: selectedPriceRange,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedPriceRange = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               Container(
                 decoration: BoxDecoration(

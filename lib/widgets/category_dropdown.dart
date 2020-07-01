@@ -2,12 +2,7 @@ import 'package:bellasareas/provider/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class CategoryDropDown extends StatefulWidget {
-  @override
-  _CategoryDropDownState createState() => _CategoryDropDownState();
-}
-
-class _CategoryDropDownState extends State<CategoryDropDown> {
+class CategoryDropDown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<CategoryProvider>(context);
@@ -18,20 +13,15 @@ class _CategoryDropDownState extends State<CategoryDropDown> {
         items: categories.map((dropdownStringItem) {
           return DropdownMenuItem<String>(
             value: dropdownStringItem,
-            child: Expanded(
-              flex: 1,
-              child: Text(
-                dropdownStringItem,
-                style: TextStyle(fontSize: 14),
-              ),
+            child: Text(
+              dropdownStringItem,
+              style: TextStyle(fontSize: 14),
             ),
           );
         }).toList(),
         value: provider.selectedCategory,
         onChanged: (value) {
-          setState(() {
-            provider.selected = value;
-          });
+          provider.selected = value;
         },
       ),
     );

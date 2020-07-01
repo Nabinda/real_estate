@@ -23,9 +23,6 @@ class PropertyGridItem extends StatelessWidget {
       onTap: () {
         Navigator.of(context)
             .pushNamed(PropertyDetailsScreen.routeName, arguments: id);
-//        Navigator.of(context).push(PageTransition(
-//            type: PageTransitionType.slideInLeft,
-//            child: PropertyDetailsScreen()));
       },
       child: Container(
         decoration: BoxDecoration(

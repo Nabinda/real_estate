@@ -65,23 +65,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-//class SplashBetween extends StatefulWidget {
-//  @override
-//  _SplashBetweenState createState() => _SplashBetweenState();
-//}
-//
-//class _SplashBetweenState extends State<SplashBetween> {
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      body: SplashScreen.navigate(
-//          name: "assets/images/splash.flr2d",
-//          startAnimation: "Untitled",
-//          loopAnimation: "Untitled",
-//          until: () => Future.delayed(Duration(seconds: 3)),
-//          alignment: Alignment.center,
-//          next: (_) => OverViewScreen()),
-//    );
-//  }
-//}

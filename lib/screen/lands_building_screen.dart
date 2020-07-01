@@ -2,8 +2,11 @@ import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
 import 'package:bellasareas/widgets/property_grid_item.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+enum SortOption { Highest, Lowest }
 
 class LandBuildingScreenHomePage extends StatefulWidget {
   static const routeName = "/land_screen";
@@ -103,10 +106,44 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
           SizedBox(
             height: 10,
           ),
-          //Body Part
+          //-------------Sorting Part-----------
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                  padding: EdgeInsets.only(left: 15.0),
+                  child: Text(
+                    "Available Properties",
+                    style: TextStyle(
+                        fontSize: 18,
+                        decoration: TextDecoration.underline,
+                        decorationColor: Colors.grey),
+                  )),
+              PopupMenuButton(
+                itemBuilder: (_) => [
+                  PopupMenuItem(
+                    child: Text("By Highest"),
+                    value: SortOption.Highest,
+                  ),
+                  PopupMenuItem(
+                    child: Text("By Lowest"),
+                    value: SortOption.Lowest,
+                  ),
+                ],
+                onSelected: (SortOption sortOption) {},
+                child: Row(
+                  children: <Widget>[
+                    Icon(Icons.sort),
+                    Text("Sort By"),
+                  ],
+                ),
+              )
+            ],
+          ),
+          //-------------------------Body Part------------------
           property.isEmpty
               ? Container(
-                  height: MediaQuery.of(context).size.height * 0.85,
+                  height: MediaQuery.of(context).size.height * 0.8,
                   alignment: Alignment.center,
                   child: Text(
                     "All the Properties are Sold!!!",
@@ -114,7 +151,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                   ),
                 )
               : Container(
-                  height: MediaQuery.of(context).size.height * 0.87,
+                  height: MediaQuery.of(context).size.height * 0.8,
                   child: ListView.builder(
                     itemBuilder: (ctx, index) => PropertyGridItem(
                       id: property[index].id,

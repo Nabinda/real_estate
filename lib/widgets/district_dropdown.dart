@@ -2,12 +2,7 @@ import 'package:bellasareas/provider/district_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class DistrictDropDown extends StatefulWidget {
-  @override
-  _DistrictDropDownState createState() => _DistrictDropDownState();
-}
-
-class _DistrictDropDownState extends State<DistrictDropDown> {
+class DistrictDropDown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<DistrictProvider>(context);
@@ -19,22 +14,17 @@ class _DistrictDropDownState extends State<DistrictDropDown> {
         items: district.map((dropdownStringItem) {
           return DropdownMenuItem<String>(
             value: dropdownStringItem,
-            child: Expanded(
-              flex: 1,
-              child: Text(
-                dropdownStringItem,
-                style: TextStyle(
-                  fontSize: 14,
-                ),
+            child: Text(
+              dropdownStringItem,
+              style: TextStyle(
+                fontSize: 14,
               ),
             ),
           );
         }).toList(),
         value: provider.selectedDistrict,
         onChanged: (value) {
-          setState(() {
-            provider.selected = value;
-          });
+          provider.selected = value;
         },
       ),
     );

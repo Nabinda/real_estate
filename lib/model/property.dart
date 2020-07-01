@@ -11,7 +11,12 @@ class Property {
   final String ownerEmail;
   final double price;
   final Category category;
-  final Map<String, Object> details;
+  final String area;
+  final double roadAccess;
+  final int floors;
+  final int bathrooms;
+  final int totalRooms;
+
   Property({
     @required this.id,
     @required this.location,
@@ -21,6 +26,10 @@ class Property {
     @required this.ownerEmail,
     @required this.price,
     @required this.category,
-    @required this.details,
+    @required this.area,
+    @required this.roadAccess,
+    this.floors,
+    this.bathrooms,
+    this.totalRooms,
   });
 }
