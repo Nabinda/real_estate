@@ -10,12 +10,13 @@ class CategoryDropDown extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 5),
       child: DropdownButton<String>(
+        dropdownColor: Colors.blueGrey,
         items: categories.map((dropdownStringItem) {
           return DropdownMenuItem<String>(
             value: dropdownStringItem,
             child: Text(
               dropdownStringItem,
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 14, color: Colors.white),
             ),
           );
         }).toList(),

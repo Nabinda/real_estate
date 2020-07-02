@@ -53,7 +53,7 @@ class PropertyGridItem extends StatelessWidget {
               height: 130,
               width: MediaQuery.of(context).size.width * 0.47,
               decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.4),
+                  color: Colors.white,
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(10.0),
                       bottomRight: Radius.circular(10.0))),

@@ -1,15 +1,99 @@
 import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/widgets/property_image_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:toast/toast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PropertyDetailsScreen extends StatelessWidget {
   static const routeName = "/property_details_screen";
+
+  Future<void> _makePhoneCall(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  Future<void> _sendMail(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    void showToast(String msg, {int duration, int gravity}) {
+      Toast.show(msg, context, duration: duration, gravity: gravity);
+    }
+
+    final provider = Provider.of<PropertyProvider>(context);
     final id = ModalRoute.of(context).settings.arguments;
-    final property = Provider.of<PropertyProvider>(context).findById(id);
+    final property =
+        Provider.of<PropertyProvider>(context, listen: false).findById(id);
+    final contact = property.ownerContact;
+    final email = property.ownerEmail;
+
+    chooseOption(BuildContext context) {
+      return showDialog(
+          barrierDismissible: true,
+          context: context,
+          builder: (context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: Container(
+                padding: EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                height: 150,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    FlatButton(
+                        child: Column(
+                          children: <Widget>[
+                            Icon(
+                              Icons.call,
+                              color: Colors.purple,
+                              size: 100,
+                            ),
+                            Text("Phone")
+                          ],
+                        ),
+                        onPressed: () {
+                          _makePhoneCall('tel:$contact');
+                          Navigator.of(context).pop();
+                        }),
+                    FlatButton(
+                      child: Column(
+                        children: <Widget>[
+                          Icon(
+                            Icons.email,
+                            color: Colors.purple,
+                            size: 100,
+                          ),
+                          Text("Mail")
+                        ],
+                      ),
+                      onPressed: () {
+                        _sendMail('mailto:$email');
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          });
+    }
+
     return SafeArea(
       child: Scaffold(
         body: Stack(
@@ -48,7 +132,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.45,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(30.0),
-                      color: Colors.white,
+                      color: Colors.blueGrey,
                     ),
                     child: Container(
                       margin: EdgeInsets.only(
@@ -345,8 +429,7 @@ class PropertyDetailsScreen extends StatelessWidget {
             Container(
               alignment: Alignment.bottomCenter,
               child: Container(
-                height: 40,
-                color: Colors.grey.withOpacity(0.5),
+                margin: EdgeInsets.only(bottom: 2),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -355,40 +438,90 @@ class PropertyDetailsScreen extends StatelessWidget {
                     ),
                     Expanded(
                       flex: 2,
-                      child: RaisedButton.icon(
-                          color: Colors.purple,
-                          elevation: 1,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.add,
-                            color: Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.purple[100],
+                              offset: Offset(0, 10),
+                              blurRadius: 10.0,
+                            ),
+                          ],
+                          gradient: LinearGradient(colors: [
+                            Colors.purple[900],
+                            Colors.purple[600],
+                            Colors.purple[300],
+                          ]),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FlatButton(
+                          onPressed: () {
+                            if (provider.checkWishList(id)) {
+                              provider.addWishList(id);
+                              showToast("Added to WishList",
+                                  gravity: Toast.CENTER,
+                                  duration: Toast.LENGTH_SHORT);
+                            } else {
+                              showToast("Already added",
+                                  gravity: Toast.CENTER,
+                                  duration: Toast.LENGTH_SHORT);
+                            }
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                "Add to WishList",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
                           ),
-                          label: Text(
-                            "Add to WishList",
-                            style: TextStyle(color: Colors.white),
-                          )),
+                        ),
+                      ),
                     ),
                     SizedBox(
                       width: 10,
                     ),
                     Expanded(
                       flex: 1,
-                      child: RaisedButton.icon(
-                          color: Colors.purple,
-                          elevation: 1,
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          onPressed: () {},
-                          icon: Icon(
-                            Icons.phone,
-                            color: Colors.white,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.purple[100],
+                              offset: Offset(0, 10),
+                              blurRadius: 10.0,
+                            ),
+                          ],
+                          gradient: LinearGradient(colors: [
+                            Colors.purple[900],
+                            Colors.purple[600],
+                            Colors.purple[300],
+                          ]),
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: FlatButton(
+                          onPressed: () {
+                            chooseOption(context);
+                          },
+                          child: Row(
+                            children: <Widget>[
+                              Icon(
+                                Icons.phone,
+                                color: Colors.white,
+                              ),
+                              Text(
+                                "Contact",
+                                style: TextStyle(color: Colors.white),
+                              )
+                            ],
                           ),
-                          label: Text(
-                            "Contact",
-                            style: TextStyle(color: Colors.white),
-                          )),
+                        ),
+                      ),
                     ),
                     SizedBox(
                       width: 10,

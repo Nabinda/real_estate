@@ -1,6 +1,7 @@
 import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
+import 'package:bellasareas/screen/wishlist_screen.dart';
 import 'package:bellasareas/widgets/property_grid_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,41 +21,63 @@ class _LandBuildingScreenHomePageState
   @override
   Widget build(BuildContext context) {
     final category = ModalRoute.of(context).settings.arguments;
-    List<Property> property;
-    category == "Lands"
-        ? property = Provider.of<PropertyProvider>(context).landProperties
-        : property = Provider.of<PropertyProvider>(context).buildingProperties;
+
     return Scaffold(
       body: Stack(
-        children: <Widget>[DrawerScreen(), LandBuildingScreen(property)],
+        children: <Widget>[DrawerScreen(), LandBuildingScreen(category)],
       ),
     );
   }
 }
 
 class LandBuildingScreen extends StatefulWidget {
-  final property;
-  LandBuildingScreen(this.property);
+  final category;
+  LandBuildingScreen(this.category);
   @override
-  _LandBuildingScreenState createState() => _LandBuildingScreenState(property);
+  _LandBuildingScreenState createState() => _LandBuildingScreenState(category);
 }
 
 class _LandBuildingScreenState extends State<LandBuildingScreen> {
-  final property;
-  _LandBuildingScreenState(this.property);
+  final category;
+  _LandBuildingScreenState(this.category);
+  List<Property> property;
   double xOffSet = 0;
   double yOffSet = 0;
   double scaleFactor = 1;
   bool isDrawerOpen = false;
+
+  void openDrawer() {
+    setState(() {
+      xOffSet = 200;
+      yOffSet = 130;
+      scaleFactor = 0.6;
+      isDrawerOpen = true;
+    });
+  }
+
+  void closeDrawer() {
+    setState(() {
+      xOffSet = 0;
+      yOffSet = 0;
+      scaleFactor = 1;
+      isDrawerOpen = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    category == "Lands"
+        ? property =
+            Provider.of<PropertyProvider>(context, listen: false).landProperties
+        : property = Provider.of<PropertyProvider>(context, listen: false)
+            .buildingProperties;
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.blueGrey,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: Column(
@@ -64,32 +87,35 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[800],
+                    offset: Offset(0, 5),
+                    blurRadius: 10.0,
+                  ),
+                ],
+                color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 isDrawerOpen
                     ? IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.purple[500],
+                        ),
                         onPressed: () {
-                          setState(() {
-                            xOffSet = 0;
-                            yOffSet = 0;
-                            isDrawerOpen = false;
-                            scaleFactor = 1;
-                          });
+                          closeDrawer();
                         },
                       )
                     : IconButton(
-                        icon: Icon(Icons.menu),
+                        icon: Icon(
+                          Icons.menu,
+                          color: Colors.purple[500],
+                        ),
                         onPressed: () {
-                          setState(() {
-                            xOffSet = 200;
-                            yOffSet = 130;
-                            scaleFactor = 0.6;
-                            isDrawerOpen = true;
-                          });
+                          openDrawer();
                         },
                       ),
                 Text(
@@ -97,8 +123,13 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: Icon(Icons.save),
-                  onPressed: () {},
+                  icon: Icon(
+                    Icons.save,
+                    color: Colors.purple[500],
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(WishList.routeName);
+                  },
                 )
               ],
             ),
@@ -115,9 +146,11 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                   child: Text(
                     "Available Properties",
                     style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                         decoration: TextDecoration.underline,
-                        decorationColor: Colors.grey),
+                        decorationColor: Colors.purple),
                   )),
               PopupMenuButton(
                 itemBuilder: (_) => [
@@ -130,11 +163,30 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                     value: SortOption.Lowest,
                   ),
                 ],
-                onSelected: (SortOption sortOption) {},
+                onSelected: (SortOption sortOption) {
+                  setState(() {
+                    if (sortOption == SortOption.Highest) {
+                      print(property);
+                    } else {
+                      property.sort((Property a, Property b) {
+                        print(a.price);
+                        return b.price.toInt().compareTo(a.price.toInt());
+                      });
+                    }
+                  });
+                },
                 child: Row(
                   children: <Widget>[
-                    Icon(Icons.sort),
-                    Text("Sort By"),
+                    Icon(
+                      Icons.sort,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      "Sort By",
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
                   ],
                 ),
               )
@@ -154,6 +206,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                   height: MediaQuery.of(context).size.height * 0.8,
                   child: ListView.builder(
                     itemBuilder: (ctx, index) => PropertyGridItem(
+                      category: property[index].category,
                       id: property[index].id,
                       imageURL: property[index].images[0],
                       price: property[index].price,

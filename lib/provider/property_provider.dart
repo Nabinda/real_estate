@@ -30,7 +30,7 @@ class PropertyProvider extends ChangeNotifier {
       bathrooms: 4,
       floors: 3,
       totalRooms: 20,
-      price: 2000000,
+      price: 200000,
       category: Category.building,
       images: [
         "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
@@ -44,7 +44,7 @@ class PropertyProvider extends ChangeNotifier {
     Property(
       id: "3",
       location: "Biratnagar",
-      price: 2000000,
+      price: 20000,
       category: Category.building,
       images: [
         "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
@@ -77,6 +77,50 @@ class PropertyProvider extends ChangeNotifier {
       roadAccess: 0.2,
     )
   ];
+  List<Property> _wishList = [
+    Property(
+      id: "1",
+      location: "Kathmandu",
+      area: "0-0-4-0",
+      roadAccess: 0.2,
+      bathrooms: 4,
+      floors: 3,
+      totalRooms: 20,
+      price: 2000000,
+      category: Category.building,
+      images: [
+        "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
+        "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
+        "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
+      ],
+      ownerContact: "9800223355",
+      ownerEmail: "abc@def.com",
+      ownerName: "ABC",
+    ),
+  ];
+  List<Property> get wishList {
+    return [..._wishList];
+  }
+
+  void addWishList(id) {
+    _wishList.add(findById(id));
+    notifyListeners();
+  }
+
+  bool checkWishList(id) {
+    Property wishList = _wishList.firstWhere((property) => property.id == id);
+    if (wishList.id != id) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void removeWishList(id) {
+    _wishList.removeWhere((property) => property.id == id);
+    notifyListeners();
+  }
+
   List<Property> get properties {
     return [..._property];
   }
@@ -98,6 +142,33 @@ class PropertyProvider extends ChangeNotifier {
   List<Property> get buildingProperties {
     return [
       ..._property.where((property) => property.category == Category.building)
+    ];
+  }
+
+  void addProperty(Property property) {
+    final newProperty = Property(
+        id: DateTime.now().toString(),
+        images: [],
+        location: property.location,
+        price: property.price,
+        category: property.category,
+        ownerContact: "",
+        ownerEmail: "",
+        ownerName: "",
+        area: property.area,
+        roadAccess: property.roadAccess,
+        bathrooms: property.bathrooms,
+        floors: property.floors,
+        totalRooms: property.totalRooms);
+    _property.add(newProperty);
+    notifyListeners();
+  }
+
+  List<Property> search(Category category, String location) {
+    return [
+      ..._property
+//      ..._property.where((property) =>
+//          property.category == category && property.location == location.trim())
     ];
   }
 }

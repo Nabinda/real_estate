@@ -1,3 +1,4 @@
+import 'package:bellasareas/screen/wishlist_screen.dart';
 import 'package:bellasareas/widgets/property_grid_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _OverViewScreenState extends State<OverViewScreen> {
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.blueGrey,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: Column(
@@ -49,20 +50,33 @@ class _OverViewScreenState extends State<OverViewScreen> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-                color: Colors.grey.withOpacity(0.4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey[800],
+                    offset: Offset(0, 5),
+                    blurRadius: 10.0,
+                  ),
+                ],
+                color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 isDrawerOpen
                     ? IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
+                        icon: Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.purple[500],
+                        ),
                         onPressed: () {
                           closeDrawer();
                         },
                       )
                     : IconButton(
-                        icon: Icon(Icons.menu),
+                        icon: Icon(
+                          Icons.menu,
+                          color: Colors.purple[500],
+                        ),
                         onPressed: () {
                           openDrawer();
                         },
@@ -72,8 +86,13 @@ class _OverViewScreenState extends State<OverViewScreen> {
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
-                  icon: Icon(Icons.save),
-                  onPressed: () {},
+                  icon: Icon(
+                    Icons.save,
+                    color: Colors.purple[500],
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(WishList.routeName);
+                  },
                 )
               ],
             ),

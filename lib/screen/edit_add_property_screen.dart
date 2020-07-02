@@ -1,6 +1,10 @@
 import 'dart:io';
+import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/category_provider.dart';
+import 'package:bellasareas/provider/district_provider.dart';
+import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
+import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/widgets/category_dropdown.dart';
 import 'package:bellasareas/widgets/district_dropdown.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +34,20 @@ class EditAddProperty extends StatefulWidget {
 }
 
 class _EditAddPropertyState extends State<EditAddProperty> {
+  var _editedProperty = Property(
+      id: null,
+      roadAccess: 0,
+      area: "",
+      ownerName: "",
+      ownerEmail: "",
+      ownerContact: "",
+      category: Category.land,
+      price: 0,
+      location: "",
+      images: [],
+      totalRooms: 0,
+      floors: 0,
+      bathrooms: 0);
   bool isImage = false;
   List<File> images = List<File>();
   final _form = GlobalKey<FormState>();
@@ -46,7 +64,8 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     "area": "",
     "floor": "",
     "bathroom": "",
-    "price": ""
+    "price": "",
+    "totalRooms": "",
   };
 
   void openDrawer() {
@@ -146,52 +165,85 @@ class _EditAddPropertyState extends State<EditAddProperty> {
         });
   }
 
+  //-------Save form------------------
+  void _saveForm() {
+    final isValid = _form.currentState.validate();
+    if (!isValid) {
+      return;
+    }
+    _form.currentState.save();
+    Provider.of<PropertyProvider>(context, listen: false)
+        .addProperty(_editedProperty);
+    Navigator.of(context).pushNamed(OverViewScreen.routeName);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final selectedCategory =
-        Provider.of<CategoryProvider>(context).selectedCategory;
+    final category = Provider.of<CategoryProvider>(context).selectedCategory;
+    Category selectedCategory =
+        category == "Lands" ? Category.land : Category.building;
+    final selectedLocation =
+        Provider.of<DistrictProvider>(context).selectedDistrict;
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
+        color: Colors.blueGrey,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             SizedBox(height: 30),
-            //---------------------------------Custom App Bar
+            //---------------------------------Custom App Bar-------------------
             Container(
               margin: EdgeInsets.symmetric(horizontal: 10),
               decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.4),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey[800],
+                      offset: Offset(0, 5),
+                      blurRadius: 10.0,
+                    ),
+                  ],
+                  color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(10.0))),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   isDrawerOpen
                       ? IconButton(
-                          icon: Icon(Icons.arrow_back_ios),
+                          icon: Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.purple[500],
+                          ),
                           onPressed: () {
                             closeDrawer();
                           },
                         )
                       : IconButton(
-                          icon: Icon(Icons.menu),
+                          icon: Icon(
+                            Icons.menu,
+                            color: Colors.purple[500],
+                          ),
                           onPressed: () {
                             openDrawer();
                           },
                         ),
                   Text(
-                    "Add Property",
+                    "Bellas Areas",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    icon: Icon(Icons.check),
-                    onPressed: () {},
+                    icon: Icon(
+                      Icons.check,
+                      color: Colors.purple[500],
+                    ),
+                    onPressed: () {
+                      _saveForm();
+                    },
                   )
                 ],
               ),
@@ -209,7 +261,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                     children: <Widget>[
                       Text(
                         "Categories:",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                       SizedBox(
                         width: 10,
@@ -222,7 +274,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                     children: <Widget>[
                       Text(
                         "Location:",
-                        style: TextStyle(fontSize: 18),
+                        style: TextStyle(fontSize: 18, color: Colors.white),
                       ),
                       SizedBox(
                         width: 10,
@@ -233,40 +285,52 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                   SizedBox(
                     height: 20,
                   ),
+                  //----------------Image Adding-----------------------------
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       Text(
                         "Images",
-                        style: TextStyle(fontSize: 20),
+                        style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                       SizedBox(
                         width: 20,
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          chooseOption(context);
-                        },
-                        child: Container(
-                          child: RaisedButton.icon(
-                              onPressed: () {
-                                chooseOption(context);
-                              },
-                              color: Colors.purpleAccent,
-                              label: Text(
-                                "Add",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              icon: Icon(
-                                Icons.add,
-                                color: Colors.white,
-                              )),
+                      Container(
+                        width: 130,
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey,
+                                offset: Offset(0, 1),
+                                blurRadius: 2),
+                          ],
+                          gradient: LinearGradient(colors: [
+                            Colors.purple[900],
+                            Colors.purple[600],
+                            Colors.purple[300],
+                          ]),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: ListTile(
+                          onTap: () {
+                            chooseOption(context);
+                          },
+                          title: Text(
+                            "Add",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          leading: Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   images.length != 0
                       ? Container(
+                          color: Colors.blueGrey,
                           height: 150,
                           width: MediaQuery.of(context).size.width * 0.85,
                           child: Expanded(
@@ -278,7 +342,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                       children: <Widget>[
                                         Container(
                                           padding: EdgeInsets.all(0.0),
-                                          width: 100,
+                                          width: 150,
                                           height: 150,
                                           decoration: BoxDecoration(
                                             border: Border.all(
@@ -309,6 +373,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                           ),
                         )
                       : Container(),
+                  //----------------------Form of other Information-------------------
                   Form(
                     key: _form,
                     child: Container(
@@ -323,57 +388,247 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                             height: 5,
                           ),
                           TextFormField(
+                            cursorColor: Colors.white,
                             keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                             maxLines: 1,
                             decoration: InputDecoration(
-                              labelText: "Area (in anna)",
-                            ),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
+                                labelText: "Area (in anna)",
+                                labelStyle: TextStyle(color: Colors.white)),
                             initialValue: initValues['area'],
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Should not be empty";
+                              }
+                              if (double.tryParse(value) == null) {
+                                return "Value must be in numeric term";
+                              }
+                              if (double.parse(value) <= 0) {
+                                return "Value should not be less than zero";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _editedProperty = Property(
+                                  area: value,
+                                  images: _editedProperty.images,
+                                  location: selectedLocation,
+                                  price: _editedProperty.price,
+                                  category: selectedCategory,
+                                  roadAccess: _editedProperty.roadAccess,
+                                  id: _editedProperty.id);
+                            },
+                          ),
+                          SizedBox(
+                            height: 7,
                           ),
                           TextFormField(
+                            cursorColor: Colors.white,
                             keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                             maxLines: 1,
                             decoration: InputDecoration(
-                                labelText: "Total Price(in Rs.)"),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
+                                labelText: "Total Price (in Rs)",
+                                labelStyle: TextStyle(color: Colors.white)),
                             initialValue: initValues['price'],
+                            onSaved: (value) {
+                              _editedProperty = Property(
+                                  area: _editedProperty.area,
+                                  images: _editedProperty.images,
+                                  location: _editedProperty.location,
+                                  price: double.parse(value),
+                                  category: _editedProperty.category,
+                                  roadAccess: _editedProperty.roadAccess,
+                                  id: _editedProperty.id);
+                            },
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Should not be empty";
+                              }
+                              if (double.tryParse(value) == null) {
+                                return "Value must be in numeric term";
+                              }
+                              if (double.parse(value) <= 0) {
+                                return "Value should not be less than zero";
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(
+                            height: 7,
                           ),
                           TextFormField(
+                            validator: (value) {
+                              if (value.isEmpty) {
+                                return "Should not be empty";
+                              }
+                              if (double.tryParse(value) == null) {
+                                return "Value must be in numeric term";
+                              }
+                              if (double.parse(value) <= 0) {
+                                return "Value should not be less than zero";
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              _editedProperty = Property(
+                                  area: _editedProperty.area,
+                                  images: _editedProperty.images,
+                                  location: _editedProperty.location,
+                                  price: _editedProperty.price,
+                                  category: _editedProperty.category,
+                                  roadAccess: double.parse(value),
+                                  id: _editedProperty.id);
+                            },
+                            cursorColor: Colors.white,
                             keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 18),
+                            style: TextStyle(fontSize: 18, color: Colors.white),
                             maxLines: 1,
                             decoration: InputDecoration(
-                                labelText: "Road Access(in km)"),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide:
+                                        BorderSide(color: Colors.white)),
+                                labelText: "Road Access(in km)",
+                                labelStyle: TextStyle(color: Colors.white)),
                             initialValue: initValues['roadAccess'],
                           ),
-                          selectedCategory == "Lands"
+                          SizedBox(
+                            height: 7,
+                          ),
+
+                          //------------------------Further form for gathering building information-------------------
+                          category == "Lands"
                               ? Container()
                               : Column(
                                   children: <Widget>[
                                     TextFormField(
+                                      onSaved: (value) {
+                                        _editedProperty = Property(
+                                            area: _editedProperty.area,
+                                            images: _editedProperty.images,
+                                            location: _editedProperty.location,
+                                            price: _editedProperty.price,
+                                            category: _editedProperty.category,
+                                            roadAccess:
+                                                _editedProperty.roadAccess,
+                                            id: _editedProperty.id,
+                                            floors: int.parse(value));
+                                      },
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return "Should not be empty";
+                                        }
+                                        if (double.tryParse(value) == null) {
+                                          return "Value must be in numeric term";
+                                        }
+                                        if (double.parse(value) <= 0) {
+                                          return "Value should not be less than zero";
+                                        }
+                                        return null;
+                                      },
+                                      cursorColor: Colors.white,
                                       keyboardType: TextInputType.number,
-                                      style: TextStyle(fontSize: 18),
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.white),
                                       maxLines: 1,
-                                      decoration:
-                                          InputDecoration(labelText: "Floors"),
+                                      decoration: InputDecoration(
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          labelText: "Floors",
+                                          labelStyle:
+                                              TextStyle(color: Colors.white)),
                                       initialValue: initValues['floor'],
                                     ),
-                                    TextFormField(
-                                      keyboardType: TextInputType.number,
-                                      style: TextStyle(fontSize: 18),
-                                      maxLines: 1,
-                                      decoration: InputDecoration(
-                                          labelText: "Bathrooms"),
-                                      initialValue: initValues['bathroom'],
+                                    SizedBox(
+                                      height: 7,
                                     ),
                                     TextFormField(
+                                      onSaved: (value) {
+                                        _editedProperty = Property(
+                                            area: _editedProperty.area,
+                                            images: _editedProperty.images,
+                                            location: _editedProperty.location,
+                                            price: _editedProperty.price,
+                                            category: _editedProperty.category,
+                                            roadAccess:
+                                                _editedProperty.roadAccess,
+                                            id: _editedProperty.id,
+                                            bathrooms: int.parse(value));
+                                      },
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return "Should not be empty";
+                                        }
+                                        if (double.tryParse(value) == null) {
+                                          return "Value must be in numeric term";
+                                        }
+                                        if (double.parse(value) <= 0) {
+                                          return "Value should not be less than zero";
+                                        }
+                                        return null;
+                                      },
+                                      cursorColor: Colors.white,
                                       keyboardType: TextInputType.number,
-                                      style: TextStyle(fontSize: 18),
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.white),
                                       maxLines: 1,
                                       decoration: InputDecoration(
-                                          labelText: "Total Rooms"),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          labelText: "Bathrooms",
+                                          labelStyle:
+                                              TextStyle(color: Colors.white)),
                                       initialValue: initValues['bathroom'],
+                                    ),
+                                    SizedBox(
+                                      height: 7,
+                                    ),
+                                    TextFormField(
+                                      onSaved: (value) {
+                                        _editedProperty = Property(
+                                            area: _editedProperty.area,
+                                            images: _editedProperty.images,
+                                            location: _editedProperty.location,
+                                            price: _editedProperty.price,
+                                            category: _editedProperty.category,
+                                            roadAccess:
+                                                _editedProperty.roadAccess,
+                                            id: _editedProperty.id,
+                                            totalRooms: int.parse(value));
+                                      },
+                                      validator: (value) {
+                                        if (value.isEmpty) {
+                                          return "Should not be empty";
+                                        }
+                                        if (double.tryParse(value) == null) {
+                                          return "Value must be in numeric term";
+                                        }
+                                        if (double.parse(value) <= 0) {
+                                          return "Value should not be less than zero";
+                                        }
+                                        return null;
+                                      },
+                                      cursorColor: Colors.white,
+                                      keyboardType: TextInputType.number,
+                                      style: TextStyle(
+                                          fontSize: 18, color: Colors.white),
+                                      maxLines: 1,
+                                      decoration: InputDecoration(
+                                          focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.white)),
+                                          labelText: "Total Rooms",
+                                          labelStyle:
+                                              TextStyle(color: Colors.white)),
+                                      initialValue: initValues['totalRooms'],
                                     ),
                                   ],
                                 ),

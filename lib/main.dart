@@ -7,6 +7,7 @@ import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';
+import 'package:bellasareas/screen/wishlist_screen.dart';
 import 'package:flare_splash_screen/flare_splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_page_transition/flutter_page_transition.dart';
@@ -33,8 +34,6 @@ class SplashClass extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        theme: ThemeData(
-            accentColor: Colors.greenAccent, primaryColor: Colors.green),
         debugShowCheckedModeBanner: false,
         home: HomePage(),
         routes: {
@@ -44,6 +43,7 @@ class SplashClass extends StatelessWidget {
               LandBuildingScreenHomePage(),
           PropertyDetailsScreen.routeName: (ctx) => PropertyDetailsScreen(),
           EditAddPropertyScreen.routeName: (ctx) => EditAddPropertyScreen(),
+          WishList.routeName: (ctx) => WishList(),
         },
       ),
     );

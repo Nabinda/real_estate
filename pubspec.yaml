@@ -33,6 +33,10 @@ dependencies:
   flutter_page_transition: ^0.1.6
   font_awesome_flutter: ^8.8.1
   image_picker: ^0.6.7+1
+  #small message pop up
+  toast: ^0.1.5
+  #for calls and sending emails
+  url_launcher: ^5.4.11
   flare_splash_screen: ^3.0.1
 
 dev_dependencies:

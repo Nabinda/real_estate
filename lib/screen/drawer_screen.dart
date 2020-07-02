@@ -18,7 +18,15 @@ class _DrawerScreenState extends State<DrawerScreen> {
     return SingleChildScrollView(
       child: Container(
         height: MediaQuery.of(context).size.height,
-        color: Colors.purple,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topCenter,
+              //end: Alignment.bottomCenter,
+              colors: [
+                Colors.purple[900],
+                Colors.purple[600],
+                Colors.purple[400],
+              ]),
+        ),
         padding: EdgeInsets.only(top: 40, left: 20, bottom: 40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -72,7 +80,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   onTap: () {
                     Navigator.of(context).pushNamed(OverViewScreen.routeName);
                   },
-                  leading: Icon(Icons.home),
+                  leading: Icon(
+                    Icons.home,
+                    color: Colors.white,
+                  ),
                   title: Text(
                     "Home",
                     style: TextStyle(color: Colors.white),
@@ -84,7 +95,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                         LandBuildingScreenHomePage.routeName,
                         arguments: "Lands");
                   },
-                  leading: Icon(Icons.map),
+                  leading: Icon(
+                    Icons.map,
+                    color: Colors.white,
+                  ),
                   title: Text(
                     "Lands",
                     style: TextStyle(color: Colors.white),
@@ -96,7 +110,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                         LandBuildingScreenHomePage.routeName,
                         arguments: "Buildings");
                   },
-                  leading: FaIcon(FontAwesomeIcons.building),
+                  leading: FaIcon(
+                    FontAwesomeIcons.building,
+                    color: Colors.white,
+                  ),
                   title: Text(
                     "Buildings",
                     style: TextStyle(color: Colors.white),
@@ -106,7 +123,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   onTap: () {
                     Navigator.of(context).pushNamed(SearchScreen.routeName);
                   },
-                  leading: Icon(Icons.search),
+                  leading: Icon(Icons.search, color: Colors.white),
                   title: Text(
                     "Search",
                     style: TextStyle(color: Colors.white),
@@ -114,7 +131,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
                 ListTile(
                   onTap: () {},
-                  leading: FaIcon(FontAwesomeIcons.landmark),
+                  leading:
+                      FaIcon(FontAwesomeIcons.landmark, color: Colors.white),
                   title: Text(
                     "Your Property",
                     style: TextStyle(color: Colors.white),
@@ -125,7 +143,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     Navigator.of(context)
                         .pushNamed(EditAddPropertyScreen.routeName);
                   },
-                  leading: Icon(Icons.add),
+                  leading: Icon(Icons.add, color: Colors.white),
                   title: Text(
                     "Add Property",
                     style: TextStyle(color: Colors.white),
