@@ -23,7 +23,7 @@ class DistrictDropDown extends StatelessWidget {
         }).toList(),
         value: provider.selectedDistrict,
         onChanged: (value) {
-          provider.selected = value;
+          provider.updateSelected = value;
         },
       ),
     );

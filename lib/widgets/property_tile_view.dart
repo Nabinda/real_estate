@@ -1,4 +1,3 @@
-import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +8,7 @@ class PropertyTileView extends StatelessWidget {
   final String imageURL;
   final String location;
   final double price;
-  final Category category;
+  final String category;
   PropertyTileView(
       {@required this.id,
       @required this.imageURL,
@@ -75,15 +74,11 @@ class PropertyTileView extends StatelessWidget {
               },
               child: Row(
                 children: <Widget>[
-                  Hero(
-                    tag: 'property$id',
-                    child: FadeInImage(
-                      placeholder: AssetImage("assets/images/bellasareas.PNG"),
-                      image: NetworkImage(imageURL),
-                      width: 100,
-                      height: 80,
-                      fit: BoxFit.cover,
-                    ),
+                  Image.network(
+                    imageURL,
+                    height: 100,
+                    width: 110,
+                    fit: BoxFit.cover,
                   ),
                   SizedBox(
                     width: 20,
@@ -92,7 +87,7 @@ class PropertyTileView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        category == Category.building ? "Building" : "Land",
+                        category == "Buildings" ? "Building" : "Land",
                         style: TextStyle(fontSize: 20),
                       ),
                       SizedBox(

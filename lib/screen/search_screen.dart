@@ -76,8 +76,6 @@ class _SearchScreenState extends State<SearchScreen> {
         Provider.of<DistrictProvider>(context, listen: false).selectedDistrict;
     String selectedCategory =
         Provider.of<CategoryProvider>(context, listen: false).selectedCategory;
-    Category category =
-        selectedCategory == "Lands" ? Category.land : Category.building;
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
@@ -232,7 +230,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     setState(() {
                       isSearch = true;
                       filterProperty = property.where((property) =>
-                          property.category == category &&
+                          property.category == selectedCategory &&
                           property.location == selectedLocation);
                     });
                   },

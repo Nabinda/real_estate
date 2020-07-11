@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart';
 import 'package:bellasareas/model/property.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +15,7 @@ class PropertyProvider extends ChangeNotifier {
       floors: 3,
       totalRooms: 20,
       price: 2000000,
-      category: Category.building,
+      category: "Buildings",
       images: [
         "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
         "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
@@ -24,14 +27,14 @@ class PropertyProvider extends ChangeNotifier {
     ),
     Property(
       id: "2",
-      location: "Pokhara",
+      location: "Kaski",
       area: "0-0-4-0",
       roadAccess: 0.2,
       bathrooms: 4,
       floors: 3,
       totalRooms: 20,
       price: 200000,
-      category: Category.building,
+      category: "Buildings",
       images: [
         "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
         "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
@@ -43,9 +46,9 @@ class PropertyProvider extends ChangeNotifier {
     ),
     Property(
       id: "3",
-      location: "Biratnagar",
+      location: "Lalitpur",
       price: 20000,
-      category: Category.building,
+      category: "Buildings",
       images: [
         "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
         "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
@@ -65,7 +68,7 @@ class PropertyProvider extends ChangeNotifier {
       ownerName: "XYZ",
       ownerEmail: "XYZ@xyz.com",
       ownerContact: "98203652133",
-      category: Category.land,
+      category: "Lands",
       price: 88888,
       location: "Kathmandu",
       images: [
@@ -87,7 +90,7 @@ class PropertyProvider extends ChangeNotifier {
       floors: 3,
       totalRooms: 20,
       price: 2000000,
-      category: Category.building,
+      category: "Buildings",
       images: [
         "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
         "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
@@ -103,17 +106,14 @@ class PropertyProvider extends ChangeNotifier {
   }
 
   void addWishList(id) {
-    _wishList.add(findById(id));
-    notifyListeners();
-  }
-
-  bool checkWishList(id) {
-    Property wishList = _wishList.firstWhere((property) => property.id == id);
-    if (wishList.id != id) {
-      return true;
+    int index = _wishList.indexOf(id);
+    print(index);
+    if (_wishList[index].id == id) {
+      print("true");
     } else {
-      return false;
+      _wishList.add(findById(id));
     }
+    notifyListeners();
   }
 
   void removeWishList(id) {
@@ -133,16 +133,20 @@ class PropertyProvider extends ChangeNotifier {
     return _property.firstWhere((property) => property.id == id).images;
   }
 
+  void highestToLowest() {
+    _property.sort((b, a) => a.price.compareTo(b.price));
+  }
+
+  void lowestToHighest() {
+    _property.sort((b, a) => b.price.compareTo(a.price));
+  }
+
   List<Property> get landProperties {
-    return [
-      ..._property.where((property) => property.category == Category.land)
-    ];
+    return [..._property.where((property) => property.category == "Lands")];
   }
 
   List<Property> get buildingProperties {
-    return [
-      ..._property.where((property) => property.category == Category.building)
-    ];
+    return [..._property.where((property) => property.category == "Buildings")];
   }
 
   void addProperty(Property property) {
@@ -151,12 +155,6 @@ class PropertyProvider extends ChangeNotifier {
         images: [],
         location: property.location,
         price: property.price,
-        category: property.category,
-        ownerContact: "",
-        ownerEmail: "",
-        ownerName: "",
-        area: property.area,
-        roadAccess: property.roadAccess,
         bathrooms: property.bathrooms,
         floors: property.floors,
         totalRooms: property.totalRooms);
@@ -164,7 +162,28 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Property> search(Category category, String location) {
+  void updateProperty(String id, Property property) {
+    final propertyIndex = _property.indexWhere((property) => property.id == id);
+    if (propertyIndex >= 0) {
+      _property[propertyIndex] = property;
+      notifyListeners();
+    }
+  }
+
+  Future uploadPhoto(BuildContext context, List<File> images) async {
+    String uploadFileUrl = "gs://bellasareas.appspot.com";
+
+    List<String> fileName;
+    for (int i = 0; i != images.length; i++) {
+      fileName.add('property/${basename(images[i].path)}');
+      StorageReference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child(fileName[0]);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[0]);
+      await uploadTask.onComplete;
+    }
+  }
+
+  List<Property> search(String category, String location) {
     return [
       ..._property
 //      ..._property.where((property) =>

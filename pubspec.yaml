@@ -37,6 +37,7 @@ dependencies:
   toast: ^0.1.5
   #for calls and sending emails
   url_launcher: ^5.4.11
+  firebase_storage: ^3.1.6
   flare_splash_screen: ^3.0.1
 
 dev_dependencies:

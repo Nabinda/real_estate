@@ -1,4 +1,5 @@
 import 'package:bellasareas/screen/edit_add_property_screen.dart';
+import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';
@@ -130,7 +131,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   ),
                 ),
                 ListTile(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.of(context)
+                        .pushNamed(EditViewScreenHomePage.routeName);
+                  },
                   leading:
                       FaIcon(FontAwesomeIcons.landmark, color: Colors.white),
                   title: Text(

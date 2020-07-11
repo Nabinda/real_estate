@@ -102,7 +102,7 @@ class _OverViewScreenState extends State<OverViewScreen> {
           ),
           //Body Part
           Container(
-              height: MediaQuery.of(context).size.height * 0.87,
+              height: MediaQuery.of(context).size.height * 0.85,
               child: PropertyGridView()),
         ],
       ),

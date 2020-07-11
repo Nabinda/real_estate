@@ -3,6 +3,7 @@ import 'package:bellasareas/provider/district_provider.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
 import 'package:bellasareas/screen/edit_add_property_screen.dart';
+import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
@@ -43,6 +44,7 @@ class SplashClass extends StatelessWidget {
               LandBuildingScreenHomePage(),
           PropertyDetailsScreen.routeName: (ctx) => PropertyDetailsScreen(),
           EditAddPropertyScreen.routeName: (ctx) => EditAddPropertyScreen(),
+          EditViewScreenHomePage.routeName: (ctx) => EditViewScreenHomePage(),
           WishList.routeName: (ctx) => WishList(),
         },
       ),

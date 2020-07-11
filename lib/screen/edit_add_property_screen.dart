@@ -34,20 +34,37 @@ class EditAddProperty extends StatefulWidget {
 }
 
 class _EditAddPropertyState extends State<EditAddProperty> {
-  var _editedProperty = Property(
-      id: null,
-      roadAccess: 0,
-      area: "",
-      ownerName: "",
-      ownerEmail: "",
-      ownerContact: "",
-      category: Category.land,
-      price: 0,
-      location: "",
-      images: [],
-      totalRooms: 0,
-      floors: 0,
-      bathrooms: 0);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (isInit) {
+      final id = ModalRoute.of(context).settings.arguments;
+      if (id != null) {
+        _editedProperty =
+            Provider.of<PropertyProvider>(context, listen: false).findById(id);
+        initValues = {
+          "category": _editedProperty.category,
+          "location": _editedProperty.location,
+          "roadAccess": _editedProperty.roadAccess.toString(),
+          "images": "",
+          "area": _editedProperty.area,
+          "floor": _editedProperty.floors.toString(),
+          "bathroom": _editedProperty.bathrooms.toString(),
+          "price": _editedProperty.price.toString(),
+          "totalRooms": _editedProperty.totalRooms.toString(),
+        };
+
+        Provider.of<CategoryProvider>(context, listen: false).updateSelected =
+            initValues["category"];
+        Provider.of<DistrictProvider>(context, listen: false).updateSelected =
+            initValues["location"];
+      }
+    }
+    isInit = true;
+  }
+
+  bool isInit = true;
+
   bool isImage = false;
   List<File> images = List<File>();
   final _form = GlobalKey<FormState>();
@@ -57,8 +74,8 @@ class _EditAddPropertyState extends State<EditAddProperty> {
   bool isDrawerOpen = false;
 
   var initValues = {
-    "category": "",
-    "location": "",
+    "category": "Lands",
+    "location": "Kathmandu",
     "roadAccess": "",
     "images": "",
     "area": "",
@@ -86,6 +103,21 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     });
   }
 
+  var _editedProperty = Property(
+      id: null,
+      roadAccess: 0,
+      area: "",
+      ownerName: "",
+      ownerEmail: "",
+      ownerContact: "",
+      category: "",
+      price: 0,
+      location: "",
+      images: [],
+      totalRooms: 0,
+      floors: 0,
+      bathrooms: 0);
+
 //-----------------to get image from storage----------
   Future getImage(bool isCamera) async {
     File image;
@@ -97,8 +129,10 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     }
 
     setState(() {
-      images.add(image);
-      images != null ? isImage = true : isImage = false;
+      if (image != null) {
+        images.add(image);
+      }
+      images.length != 0 ? isImage = true : isImage = false;
     });
   }
 
@@ -171,17 +205,23 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     if (!isValid) {
       return;
     }
+    if (_editedProperty.id != null) {
+      print("updated");
+      Provider.of<PropertyProvider>(context, listen: false)
+          .updateProperty(_editedProperty.id, _editedProperty);
+    } else {
+      Provider.of<PropertyProvider>(context, listen: false)
+          .uploadPhoto(context, images);
+      Provider.of<PropertyProvider>(context, listen: false)
+          .addProperty(_editedProperty);
+    }
     _form.currentState.save();
-    Provider.of<PropertyProvider>(context, listen: false)
-        .addProperty(_editedProperty);
     Navigator.of(context).pushNamed(OverViewScreen.routeName);
   }
 
   @override
   Widget build(BuildContext context) {
     final category = Provider.of<CategoryProvider>(context).selectedCategory;
-    Category selectedCategory =
-        category == "Lands" ? Category.land : Category.building;
     final selectedLocation =
         Provider.of<DistrictProvider>(context).selectedDistrict;
     return AnimatedContainer(
@@ -213,25 +253,35 @@ class _EditAddPropertyState extends State<EditAddProperty> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  isDrawerOpen
+                  _editedProperty.id != null
                       ? IconButton(
                           icon: Icon(
                             Icons.arrow_back_ios,
                             color: Colors.purple[500],
                           ),
                           onPressed: () {
-                            closeDrawer();
+                            Navigator.of(context).pop();
                           },
                         )
-                      : IconButton(
-                          icon: Icon(
-                            Icons.menu,
-                            color: Colors.purple[500],
-                          ),
-                          onPressed: () {
-                            openDrawer();
-                          },
-                        ),
+                      : isDrawerOpen
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.arrow_back_ios,
+                                color: Colors.purple[500],
+                              ),
+                              onPressed: () {
+                                closeDrawer();
+                              },
+                            )
+                          : IconButton(
+                              icon: Icon(
+                                Icons.menu,
+                                color: Colors.purple[500],
+                              ),
+                              onPressed: () {
+                                openDrawer();
+                              },
+                            ),
                   Text(
                     "Bellas Areas",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -328,11 +378,11 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                       ),
                     ],
                   ),
-                  images.length != 0
+                  isImage
                       ? Container(
                           color: Colors.blueGrey,
                           height: 150,
-                          width: MediaQuery.of(context).size.width * 0.85,
+                          width: MediaQuery.of(context).size.width * 0.82,
                           child: Expanded(
                             child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
@@ -372,7 +422,10 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                     )),
                           ),
                         )
-                      : Container(),
+                      : Container(
+                          height: 0,
+                          width: 0,
+                        ),
                   //----------------------Form of other Information-------------------
                   Form(
                     key: _form,
@@ -417,7 +470,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                   images: _editedProperty.images,
                                   location: selectedLocation,
                                   price: _editedProperty.price,
-                                  category: selectedCategory,
+                                  category: category,
                                   roadAccess: _editedProperty.roadAccess,
                                   id: _editedProperty.id);
                             },

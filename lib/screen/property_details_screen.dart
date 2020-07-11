@@ -1,4 +1,3 @@
-import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/widgets/property_image_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -110,10 +109,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                 Container(
                   child: Stack(
                     children: <Widget>[
-                      Hero(
-                        tag: id,
-                        child: PropertyImageSlider(id),
-                      ),
+                      PropertyImageSlider(id),
                       IconButton(
                         icon: Icon(Icons.arrow_back_ios, color: Colors.white),
                         onPressed: () {
@@ -253,7 +249,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                                   SizedBox(
                                     height: 7.0,
                                   ),
-                                  property.category == Category.building
+                                  property.category == "Buildings"
                                       ? Column(
                                           children: <Widget>[
                                             Row(
@@ -456,16 +452,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                         ),
                         child: FlatButton(
                           onPressed: () {
-                            if (provider.checkWishList(id)) {
-                              provider.addWishList(id);
-                              showToast("Added to WishList",
-                                  gravity: Toast.CENTER,
-                                  duration: Toast.LENGTH_SHORT);
-                            } else {
-                              showToast("Already added",
-                                  gravity: Toast.CENTER,
-                                  duration: Toast.LENGTH_SHORT);
-                            }
+                            provider.addWishList(id);
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

@@ -52,6 +52,12 @@ class WishList extends StatelessWidget {
                   ],
                 ),
               ),
+//              property == null
+//                  ? Center(
+//                      child: Container(
+//                      child: Text("Your WishList is Empty"),
+//                    ))
+//                  :
               Container(
                 height: MediaQuery.of(context).size.height * 0.87,
                 child: ListView.builder(

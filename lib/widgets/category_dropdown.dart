@@ -22,7 +22,7 @@ class CategoryDropDown extends StatelessWidget {
         }).toList(),
         value: provider.selectedCategory,
         onChanged: (value) {
-          provider.selected = value;
+          provider.updateSelected = value;
         },
       ),
     );

@@ -87,7 +87,7 @@ class DistrictProvider extends ChangeNotifier {
     return selectedDistrict;
   }
 
-  set selected(String selected) {
+  set updateSelected(String selected) {
     selectedDistrict = selected;
     notifyListeners();
   }

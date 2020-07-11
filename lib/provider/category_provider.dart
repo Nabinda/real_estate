@@ -12,7 +12,7 @@ class CategoryProvider extends ChangeNotifier {
     return selectedCategory;
   }
 
-  set selected(String selected) {
+  set updateSelected(String selected) {
     selectedCategory = selected;
     notifyListeners();
   }

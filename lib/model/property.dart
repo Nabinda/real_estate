@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-enum Category { land, building }
-
 class Property {
   final String id;
   final String location;
@@ -10,7 +8,7 @@ class Property {
   final String ownerName;
   final String ownerEmail;
   final double price;
-  final Category category;
+  final String category;
   final String area;
   final double roadAccess;
   final int floors;

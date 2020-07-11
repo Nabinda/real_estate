@@ -66,6 +66,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<PropertyProvider>(context, listen: false);
     category == "Lands"
         ? property =
             Provider.of<PropertyProvider>(context, listen: false).landProperties
@@ -154,11 +155,11 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                   )),
               PopupMenuButton(
                 itemBuilder: (_) => [
-                  PopupMenuItem(
+                  PopupMenuItem<SortOption>(
                     child: Text("By Highest"),
                     value: SortOption.Highest,
                   ),
-                  PopupMenuItem(
+                  PopupMenuItem<SortOption>(
                     child: Text("By Lowest"),
                     value: SortOption.Lowest,
                   ),
@@ -166,12 +167,9 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                 onSelected: (SortOption sortOption) {
                   setState(() {
                     if (sortOption == SortOption.Highest) {
-                      print(property);
+                      provider.highestToLowest();
                     } else {
-                      property.sort((Property a, Property b) {
-                        print(a.price);
-                        return b.price.toInt().compareTo(a.price.toInt());
-                      });
+                      provider.lowestToHighest();
                     }
                   });
                 },

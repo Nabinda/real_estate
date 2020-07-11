@@ -1,0 +1,36 @@
+{
+  "project_info": {
+    "project_number": "1086745201258",
+    "firebase_url": "https://bellasareas.firebaseio.com",
+    "project_id": "bellasareas",
+    "storage_bucket": "bellasareas.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1086745201258:android:0486ed8b56678d1a70d813",
+        "android_client_info": {
+          "package_name": "np.com.psykho.bellasareas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1086745201258-kgeagjmnpfpeubssjd6hp4pnhpnn1sv6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1086745201258-kgeagjmnpfpeubssjd6hp4pnhpnn1sv6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

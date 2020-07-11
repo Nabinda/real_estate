@@ -10,7 +10,7 @@ class PropertyGridItem extends StatelessWidget {
   final String imageURL;
   final String location;
   final double price;
-  final Category category;
+  final String category;
   PropertyGridItem(
       {@required this.id,
       @required this.imageURL,
@@ -63,9 +63,7 @@ class PropertyGridItem extends StatelessWidget {
                     height: 10,
                   ),
                   Text(
-                    category == Category.land
-                        ? "Land on Sale"
-                        : "Building on Sale",
+                    category == "Lands" ? "Land on Sale" : "Building on Sale",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 20,
@@ -85,7 +83,7 @@ class PropertyGridItem extends StatelessWidget {
                       ),
                       Flexible(
                         child: Text(
-                          "location,location,location",
+                          location,
                         ),
                       )
                     ],
