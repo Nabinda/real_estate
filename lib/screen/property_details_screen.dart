@@ -32,7 +32,7 @@ class PropertyDetailsScreen extends StatelessWidget {
     }
 
     final provider = Provider.of<PropertyProvider>(context);
-    final id = ModalRoute.of(context).settings.arguments;
+    final id = ModalRoute.of(context).settings.arguments.toString();
     final property =
         Provider.of<PropertyProvider>(context, listen: false).findById(id);
     final contact = property.ownerContact;

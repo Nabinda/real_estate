@@ -105,15 +105,22 @@ class PropertyProvider extends ChangeNotifier {
     return [..._wishList];
   }
 
-  void addWishList(id) {
-    int index = _wishList.indexOf(id);
-    print(index);
-    if (_wishList[index].id == id) {
-      print("true");
-    } else {
+  void addWishList(String id) {
+    print("from addwishlist : " + "$id");
+    print(_wishList);
+    bool _value = false;
+    _wishList.forEach((element) {
+      if (element.id == id) {
+        print("alreay exist");
+        _value = true;
+      }
+    });
+    if (!_value) {
       _wishList.add(findById(id));
+      notifyListeners();
+      print("new value added to list");
+      print(_wishList);
     }
-    notifyListeners();
   }
 
   void removeWishList(id) {

@@ -66,16 +66,30 @@ class _SearchScreenState extends State<SearchScreen> {
   double scaleFactor = 1;
   bool isDrawerOpen = false;
   bool isSearch = false;
-  @override
-  Widget build(BuildContext context) {
+  List<Property> filterProperty = <Property>[];
+//-----------------------Search Result Generator-----------------
+  void addToFilterProperty(BuildContext context) {
+    final provider = Provider.of<PropertyProvider>(context, listen: false);
     List<Property> property =
         Provider.of<PropertyProvider>(context, listen: false).properties;
-    List<Property> filterProperty = <Property>[];
-
     String selectedLocation =
         Provider.of<DistrictProvider>(context, listen: false).selectedDistrict;
     String selectedCategory =
         Provider.of<CategoryProvider>(context, listen: false).selectedCategory;
+    setState(() {
+      isSearch = true;
+    });
+    filterProperty.clear();
+    property.forEach((property) {
+      if (property.category.toLowerCase() == selectedCategory.toLowerCase() &&
+          property.location.toLowerCase() == selectedLocation.toLowerCase()) {
+        filterProperty.add(provider.findById(property.id));
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
@@ -227,12 +241,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 width: 130,
                 child: ListTile(
                   onTap: () {
-                    setState(() {
-                      isSearch = true;
-                      filterProperty = property.where((property) =>
-                          property.category == selectedCategory &&
-                          property.location == selectedLocation);
-                    });
+                    addToFilterProperty(context);
                   },
                   title: Text(
                     "Search",
@@ -247,18 +256,22 @@ class _SearchScreenState extends State<SearchScreen> {
               Divider(),
               //----------Search Results here-------------------
               isSearch
-                  ? Container(
-                      height: MediaQuery.of(context).size.height * 0.5,
-                      child: ListView.builder(
-                        itemBuilder: (ctx, index) => PropertyGridItem(
-                          category: filterProperty[index].category,
-                          location: filterProperty[index].location,
-                          price: filterProperty[index].price,
-                          imageURL: filterProperty[index].images[0],
-                          id: filterProperty[index].id,
-                        ),
-                        itemCount: filterProperty.length,
-                      ))
+                  ? filterProperty == null
+                      ? Center(
+                          child: Text("NO RESULT FOUND!!!"),
+                        )
+                      : Container(
+                          height: MediaQuery.of(context).size.height * 0.5,
+                          child: ListView.builder(
+                            itemBuilder: (ctx, index) => PropertyGridItem(
+                              category: filterProperty[index].category,
+                              location: filterProperty[index].location,
+                              price: filterProperty[index].price,
+                              imageURL: filterProperty[index].images[0],
+                              id: filterProperty[index].id,
+                            ),
+                            itemCount: filterProperty.length,
+                          ))
                   : Center(
                       child: Icon(
                       Icons.search,
