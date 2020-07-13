@@ -103,6 +103,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     });
   }
 
+  String cat;
   var _editedProperty = Property(
       id: null,
       roadAccess: 0,
@@ -210,6 +211,8 @@ class _EditAddPropertyState extends State<EditAddProperty> {
       Provider.of<PropertyProvider>(context, listen: false)
           .updateProperty(_editedProperty.id, _editedProperty);
     } else {
+      print("Added Value------------");
+      print(_editedProperty.category);
       Provider.of<PropertyProvider>(context, listen: false)
           .uploadPhoto(context, images);
       Provider.of<PropertyProvider>(context, listen: false)
@@ -427,18 +430,15 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                           width: 0,
                         ),
                   //----------------------Form of other Information-------------------
-                  Form(
-                    key: _form,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      padding: EdgeInsets.symmetric(vertical: 10.0),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    padding: EdgeInsets.symmetric(vertical: 10.0),
+                    child: Form(
+                      key: _form,
                       child: Column(
                         children: <Widget>[
                           SizedBox(
-                            height: 5,
-                          ),
-                          SizedBox(
-                            height: 5,
+                            height: 10,
                           ),
                           TextFormField(
                             cursorColor: Colors.white,
@@ -464,15 +464,30 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                               }
                               return null;
                             },
-                            onSaved: (value) {
+                            onSaved: (userInput) {
                               _editedProperty = Property(
-                                  area: value,
-                                  images: _editedProperty.images,
-                                  location: selectedLocation,
-                                  price: _editedProperty.price,
-                                  category: category,
+                                  id: _editedProperty.id,
                                   roadAccess: _editedProperty.roadAccess,
-                                  id: _editedProperty.id);
+                                  area: userInput,
+                                  ownerName: _editedProperty.ownerName,
+                                  ownerEmail: _editedProperty.ownerEmail,
+                                  ownerContact: _editedProperty.ownerContact,
+                                  category: category,
+                                  price: _editedProperty.price,
+                                  location: selectedLocation,
+                                  images: _editedProperty.images,
+                                  totalRooms: _editedProperty.totalRooms,
+                                  floors: _editedProperty.floors,
+                                  bathrooms: _editedProperty.bathrooms);
+
+                              // _editedProperty = Property(
+                              //     area: userInput,
+                              //     images: _editedProperty.images,
+                              //     location: selectedLocation,
+                              //     price: _editedProperty.price,
+                              //     category: category,
+                              //     roadAccess: _editedProperty.roadAccess,
+                              //     id: _editedProperty.id);
                             },
                           ),
                           SizedBox(
@@ -688,7 +703,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             )

@@ -1,7 +1,7 @@
 import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
-import 'package:bellasareas/screen/edit_add_property_screen.dart';
+import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/wishlist_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,8 +55,7 @@ class _EditViewScreenState extends State<EditViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<Property> property =
-        Provider.of<PropertyProvider>(context, listen: false).properties;
+    List<Property> property = Provider.of<PropertyProvider>(context).properties;
     return AnimatedContainer(
       height: MediaQuery.of(context).size.height,
       transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
@@ -166,7 +165,11 @@ class _EditViewScreenState extends State<EditViewScreen> {
                               size: 16,
                               color: Colors.purple,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Provider.of<PropertyProvider>(context,
+                                      listen: false)
+                                  .removeProperty(property[index].id);
+                            },
                           ),
                         ],
                       ),

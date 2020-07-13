@@ -1,4 +1,4 @@
-import 'package:bellasareas/screen/edit_add_property_screen.dart';
+import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/overview_screen.dart';

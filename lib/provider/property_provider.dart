@@ -1,8 +1,10 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:path/path.dart';
 import 'package:bellasareas/model/property.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class PropertyProvider extends ChangeNotifier {
   List<Property> _property = [
@@ -101,35 +103,12 @@ class PropertyProvider extends ChangeNotifier {
       ownerName: "ABC",
     ),
   ];
-  List<Property> get wishList {
-    return [..._wishList];
-  }
-
-  void addWishList(String id) {
-    print("from addwishlist : " + "$id");
-    print(_wishList);
-    bool _value = false;
-    _wishList.forEach((element) {
-      if (element.id == id) {
-        print("alreay exist");
-        _value = true;
-      }
-    });
-    if (!_value) {
-      _wishList.add(findById(id));
-      notifyListeners();
-      print("new value added to list");
-      print(_wishList);
-    }
-  }
-
-  void removeWishList(id) {
-    _wishList.removeWhere((property) => property.id == id);
-    notifyListeners();
-  }
-
   List<Property> get properties {
     return [..._property];
+  }
+
+  List<Property> get wishList {
+    return [..._wishList];
   }
 
   Property findById(String id) {
@@ -140,14 +119,6 @@ class PropertyProvider extends ChangeNotifier {
     return _property.firstWhere((property) => property.id == id).images;
   }
 
-  void highestToLowest() {
-    _property.sort((b, a) => a.price.compareTo(b.price));
-  }
-
-  void lowestToHighest() {
-    _property.sort((b, a) => b.price.compareTo(a.price));
-  }
-
   List<Property> get landProperties {
     return [..._property.where((property) => property.category == "Lands")];
   }
@@ -156,19 +127,83 @@ class PropertyProvider extends ChangeNotifier {
     return [..._property.where((property) => property.category == "Buildings")];
   }
 
-  void addProperty(Property property) {
-    final newProperty = Property(
-        id: DateTime.now().toString(),
-        images: [],
-        location: property.location,
-        price: property.price,
-        bathrooms: property.bathrooms,
-        floors: property.floors,
-        totalRooms: property.totalRooms);
-    _property.add(newProperty);
+//---------------------Add to WishList-------------------
+  void addWishList(String id) {
+    bool _value = false;
+    _wishList.forEach((element) {
+      if (element.id == id) {
+        _value = true;
+      }
+    });
+    if (!_value) {
+      _wishList.add(findById(id));
+      notifyListeners();
+    }
+  }
+
+//----------------Remove from WishList-------------
+  void removeWishList(id) {
+    _wishList.removeWhere((property) => property.id == id);
     notifyListeners();
   }
 
+//-----------Remove Property------------------
+  void removeProperty(String id) {
+    print(id);
+    _property.removeWhere((property) => property.id == id);
+    print("removed");
+    notifyListeners();
+  }
+
+//-----------------Sorting Function-----------------
+  void highestToLowest() {
+    _property.sort((b, a) => a.price.compareTo(b.price));
+  }
+
+  void lowestToHighest() {
+    _property.sort((b, a) => b.price.compareTo(a.price));
+  }
+  //--------------END OF SORTING FUNCTION-----------------
+
+//-----------------add Property-------------
+  Future<void> addProperty(Property property) async {
+    final url = "https://bellasareas.firebaseio.com/properties.json";
+
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            "images": [],
+            "location": property.location,
+            "price": property.price,
+            "bathrooms": property.bathrooms,
+            "floors": property.floors,
+            "category": property.category,
+            "roadAccess": property.roadAccess,
+            "area": property.area,
+            "totalRooms": property.totalRooms,
+            "ownerContact": property.ownerContact,
+            "ownerEmail": property.ownerEmail,
+            "ownerName": property.ownerName,
+          }));
+      final newProperty = Property(
+          id: DateTime.now().toString(),
+          images: [],
+          location: property.location,
+          price: property.price,
+          bathrooms: property.bathrooms,
+          floors: property.floors,
+          category: property.category,
+          roadAccess: property.roadAccess,
+          area: property.area,
+          totalRooms: property.totalRooms);
+      _property.add(newProperty);
+      notifyListeners();
+    } catch (error) {
+      throw (error);
+    }
+  }
+
+//---------------------update Property------------
   void updateProperty(String id, Property property) {
     final propertyIndex = _property.indexWhere((property) => property.id == id);
     if (propertyIndex >= 0) {
@@ -177,24 +212,20 @@ class PropertyProvider extends ChangeNotifier {
     }
   }
 
+//---------------Upload photo to firebase Storage----------------------
   Future uploadPhoto(BuildContext context, List<File> images) async {
-    String uploadFileUrl = "gs://bellasareas.appspot.com";
+    List<String> fileName = [];
+//    final StorageReference firebaseStorageRef =
+//        FirebaseStorage.instance.ref().child('myImages.jpg');
+//    final StorageUploadTask task = firebaseStorageRef.putFile(images[0]);
 
-    List<String> fileName;
     for (int i = 0; i != images.length; i++) {
       fileName.add('property/${basename(images[i].path)}');
+      print(fileName[i]);
       StorageReference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child(fileName[0]);
-      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[0]);
+          FirebaseStorage.instance.ref().child(fileName[i]);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
       await uploadTask.onComplete;
     }
-  }
-
-  List<Property> search(String category, String location) {
-    return [
-      ..._property
-//      ..._property.where((property) =>
-//          property.category == category && property.location == location.trim())
-    ];
   }
 }

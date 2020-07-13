@@ -7,6 +7,7 @@ class PropertyGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final property = Provider.of<PropertyProvider>(context).properties;
+    property.shuffle();
     return ListView.builder(
       itemBuilder: (ctx, index) => PropertyGridItem(
         id: property[index].id,

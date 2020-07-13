@@ -56,9 +56,9 @@ class _SearchScreenState extends State<SearchScreen> {
 
   List<String> priceRange = [
     "All",
-    "1000000-1500000",
-    "1500000-2000000",
-    "2000000-3000000"
+    "1000000 and above",
+    "1500000 and above",
+    "2000000 and above"
   ];
   String selectedPriceRange = "All";
   double xOffSet = 0;
@@ -256,9 +256,12 @@ class _SearchScreenState extends State<SearchScreen> {
               Divider(),
               //----------Search Results here-------------------
               isSearch
-                  ? filterProperty == null
+                  ? filterProperty.isEmpty
                       ? Center(
-                          child: Text("NO RESULT FOUND!!!"),
+                          child: Text(
+                            "NO RESULT FOUND!!!",
+                            style: TextStyle(color: Colors.white),
+                          ),
                         )
                       : Container(
                           height: MediaQuery.of(context).size.height * 0.5,
