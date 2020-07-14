@@ -1,7 +1,9 @@
+import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/wishlist_screen.dart';
 import 'package:bellasareas/widgets/property_grid_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class OverViewScreen extends StatefulWidget {
   static const routeName = "/overViewScreen";
@@ -14,6 +16,27 @@ class _OverViewScreenState extends State<OverViewScreen> {
   double yOffSet = 0;
   double scaleFactor = 1;
   bool isDrawerOpen = false;
+  bool _isInit = true;
+  bool _isLoading = false;
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<PropertyProvider>(context, listen: false)
+          .fetchAndSetProperty()
+          .then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = true;
+
+    super.didChangeDependencies();
+  }
+
   void openDrawer() {
     setState(() {
       xOffSet = 200;
@@ -103,7 +126,12 @@ class _OverViewScreenState extends State<OverViewScreen> {
           //Body Part
           Container(
               height: MediaQuery.of(context).size.height * 0.85,
-              child: PropertyGridView()),
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(
+                      backgroundColor: Colors.red,
+                    ))
+                  : PropertyGridView()),
         ],
       ),
     );

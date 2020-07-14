@@ -9,79 +9,79 @@ import 'package:http/http.dart' as http;
 class PropertyProvider extends ChangeNotifier {
   String propertyId;
   List<Property> _property = [
-    Property(
-      id: "1",
-      location: "Kathmandu",
-      area: "0-0-4-0",
-      roadAccess: 0.2,
-      bathrooms: 4,
-      floors: 3,
-      totalRooms: 20,
-      price: 2000000,
-      category: "Buildings",
-      images: [
-        "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-        "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-        "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-      ],
-      ownerContact: "9800223355",
-      ownerEmail: "abc@def.com",
-      ownerName: "ABC",
-    ),
-    Property(
-      id: "2",
-      location: "Kaski",
-      area: "0-0-4-0",
-      roadAccess: 0.2,
-      bathrooms: 4,
-      floors: 3,
-      totalRooms: 20,
-      price: 200000,
-      category: "Buildings",
-      images: [
-        "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-        "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-        "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-      ],
-      ownerContact: "9800223355",
-      ownerEmail: "abc@def.com",
-      ownerName: "ABC",
-    ),
-    Property(
-      id: "3",
-      location: "Lalitpur",
-      price: 20000,
-      category: "Buildings",
-      images: [
-        "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-        "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-        "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-      ],
-      ownerContact: "9800223355",
-      ownerEmail: "abc@def.com",
-      ownerName: "ABC",
-      area: "0-0-4-0",
-      roadAccess: 0.2,
-      bathrooms: 4,
-      floors: 3,
-      totalRooms: 20,
-    ),
-    Property(
-      id: "4",
-      ownerName: "XYZ",
-      ownerEmail: "XYZ@xyz.com",
-      ownerContact: "98203652133",
-      category: "Lands",
-      price: 88888,
-      location: "Kathmandu",
-      images: [
-        "https://www.tni.org/files/styles/content_full_width/public/mspp.jpeg?itok=iWMByTJ3",
-        "https://upload.wikimedia.org/wikipedia/commons/c/c4/Pennsylvania_State_Game_Lands_Number_226_sign.JPG",
-        "https://lh3.googleusercontent.com/proxy/QB-rj-wbg6tNrpVyvUTbrC0EzlboAm1Q3w3AI3lKmSNuawuHQ2aeEDE1MqjK51flE8UlF98QkEQ6pRMaZ40JCgZNnPYm9F9DoGtrc4Y5o9M8efdXrpuXnIuu1Py5lctnAFzVcEo"
-      ],
-      area: "0-0-4-0",
-      roadAccess: 0.2,
-    )
+    // Property(
+    //   id: "1",
+    //   location: "Kathmandu",
+    //   area: "0-0-4-0",
+    //   roadAccess: 0.2,
+    //   bathrooms: 4,
+    //   floors: 3,
+    //   totalRooms: 20,
+    //   price: 2000000,
+    //   category: "Buildings",
+    //   images: [
+    //     "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
+    //     "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
+    //     "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
+    //   ],
+    //   ownerContact: "9800223355",
+    //   ownerEmail: "abc@def.com",
+    //   ownerName: "ABC",
+    // ),
+    // Property(
+    //   id: "2",
+    //   location: "Kaski",
+    //   area: "0-0-4-0",
+    //   roadAccess: 0.2,
+    //   bathrooms: 4,
+    //   floors: 3,
+    //   totalRooms: 20,
+    //   price: 200000,
+    //   category: "Buildings",
+    //   images: [
+    //     "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
+    //     "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
+    //     "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
+    //   ],
+    //   ownerContact: "9800223355",
+    //   ownerEmail: "abc@def.com",
+    //   ownerName: "ABC",
+    // ),
+    // Property(
+    //   id: "3",
+    //   location: "Lalitpur",
+    //   price: 20000,
+    //   category: "Buildings",
+    //   images: [
+    //     "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
+    //     "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
+    //     "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
+    //   ],
+    //   ownerContact: "9800223355",
+    //   ownerEmail: "abc@def.com",
+    //   ownerName: "ABC",
+    //   area: "0-0-4-0",
+    //   roadAccess: 0.2,
+    //   bathrooms: 4,
+    //   floors: 3,
+    //   totalRooms: 20,
+    // ),
+    // Property(
+    //   id: "4",
+    //   ownerName: "XYZ",
+    //   ownerEmail: "XYZ@xyz.com",
+    //   ownerContact: "98203652133",
+    //   category: "Lands",
+    //   price: 88888,
+    //   location: "Kathmandu",
+    //   images: [
+    //     "https://www.tni.org/files/styles/content_full_width/public/mspp.jpeg?itok=iWMByTJ3",
+    //     "https://upload.wikimedia.org/wikipedia/commons/c/c4/Pennsylvania_State_Game_Lands_Number_226_sign.JPG",
+    //     "https://lh3.googleusercontent.com/proxy/QB-rj-wbg6tNrpVyvUTbrC0EzlboAm1Q3w3AI3lKmSNuawuHQ2aeEDE1MqjK51flE8UlF98QkEQ6pRMaZ40JCgZNnPYm9F9DoGtrc4Y5o9M8efdXrpuXnIuu1Py5lctnAFzVcEo"
+    //   ],
+    //   area: "0-0-4-0",
+    //   roadAccess: 0.2,
+    // )
   ];
   List<Property> _wishList = [];
   List<Property> get properties {
@@ -129,11 +129,27 @@ class PropertyProvider extends ChangeNotifier {
   }
 
 //-----------Remove Property------------------
-  void removeProperty(String id) {
-    print(id);
+  Future<void> removeProperty(String id) async {
+    final url = "https://bellasareas.firebaseio.com/properties/$id.json";
+    final existingPropertyIndex =
+        properties.indexWhere((property) => property.id == id);
+    var existingProperty = _property[existingPropertyIndex];
     _property.removeWhere((property) => property.id == id);
-    print("removed");
     notifyListeners();
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode >= 400) {
+        _property.insert(existingPropertyIndex, existingProperty);
+        notifyListeners();
+        throw HttpException("Could not delete Property");
+      } else {
+        existingProperty = null;
+      }
+    } catch (error) {
+      _property.insert(existingPropertyIndex, existingProperty);
+      notifyListeners();
+      throw HttpException("Could not delete Property");
+    }
   }
 
 //-----------------Sorting Function-----------------
@@ -259,7 +275,7 @@ class PropertyProvider extends ChangeNotifier {
         loadedProperty.add(Property(
             id: propertyId,
             location: propertyData["location"],
-            images: [],
+            images: List.from(propertyData['images']),
             bathrooms: propertyData["bathrooms"],
             floors: propertyData["floors"],
             ownerContact: propertyData["ownerContact"],

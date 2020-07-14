@@ -72,6 +72,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
   double yOffSet = 0;
   double scaleFactor = 1;
   bool isDrawerOpen = false;
+  bool isLoading = false;
 
   var initValues = {
     "category": "Lands",
@@ -117,7 +118,6 @@ class _EditAddPropertyState extends State<EditAddProperty> {
       totalRooms: 0,
       floors: 0,
       bathrooms: 0);
-  bool isLoading = false;
 
 //-----------------to get image from mobile storage----------
   Future getImage(bool isCamera) async {
@@ -208,6 +208,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     if (!isValid) {
       return;
     }
+
     _form.currentState.save();
     setState(() {
       isLoading = true;
@@ -276,9 +277,24 @@ class _EditAddPropertyState extends State<EditAddProperty> {
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
+          ? Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.9,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  CircularProgressIndicator(
+                    backgroundColor: Colors.red,
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    "Adding...",
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ))
           : SingleChildScrollView(
               child: Column(
                 children: <Widget>[
@@ -339,7 +355,25 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                             color: Colors.purple[500],
                           ),
                           onPressed: () {
-                            _saveForm();
+                            if (images.isEmpty) {
+                              showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                        title: Text("Add Image"),
+                                        content:
+                                            Text("You need add Image first"),
+                                        actions: <Widget>[
+                                          FlatButton(
+                                            child: Text("OK"),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                          )
+                                        ],
+                                      ));
+                            } else {
+                              _saveForm();
+                            }
                           },
                         )
                       ],
