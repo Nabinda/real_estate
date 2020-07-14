@@ -34,7 +34,7 @@ dependencies:
   font_awesome_flutter: ^8.8.1
   image_picker: ^0.6.7+1
   #small message pop up
-  toast: ^0.1.5
+  fluttertoast: ^6.0.1
   #for calls and sending emails
   url_launcher: ^5.4.11
   firebase_storage: ^3.1.6

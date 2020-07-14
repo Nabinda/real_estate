@@ -52,25 +52,29 @@ class WishList extends StatelessWidget {
                   ],
                 ),
               ),
-//              property == null
-//                  ? Center(
-//                      child: Container(
-//                      child: Text("Your WishList is Empty"),
-//                    ))
-//                  :
-              Container(
-                height: MediaQuery.of(context).size.height * 0.87,
-                child: ListView.builder(
-                  itemBuilder: (ctx, index) => PropertyTileView(
-                    id: property[index].id,
-                    imageURL: property[index].images[0],
-                    price: property[index].price,
-                    location: property[index].location,
-                    category: property[index].category,
-                  ),
-                  itemCount: property.length,
-                ),
-              ),
+              property.isEmpty
+                  ? Container(
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      child: Center(
+                        child: Text(
+                          "Your WishList is Empty!!!!",
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                      ),
+                    )
+                  : Container(
+                      height: MediaQuery.of(context).size.height * 0.87,
+                      child: ListView.builder(
+                        itemBuilder: (ctx, index) => PropertyTileView(
+                          id: property[index].id,
+                          imageURL: property[index].images[0],
+                          price: property[index].price,
+                          location: property[index].location,
+                          category: property[index].category,
+                        ),
+                        itemCount: property.length,
+                      ),
+                    ),
             ],
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class PropertyProvider extends ChangeNotifier {
+  String propertyId;
   List<Property> _property = [
     Property(
       id: "1",
@@ -82,27 +83,7 @@ class PropertyProvider extends ChangeNotifier {
       roadAccess: 0.2,
     )
   ];
-  List<Property> _wishList = [
-    Property(
-      id: "1",
-      location: "Kathmandu",
-      area: "0-0-4-0",
-      roadAccess: 0.2,
-      bathrooms: 4,
-      floors: 3,
-      totalRooms: 20,
-      price: 2000000,
-      category: "Buildings",
-      images: [
-        "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-        "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-        "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-      ],
-      ownerContact: "9800223355",
-      ownerEmail: "abc@def.com",
-      ownerName: "ABC",
-    ),
-  ];
+  List<Property> _wishList = [];
   List<Property> get properties {
     return [..._property];
   }
@@ -166,13 +147,24 @@ class PropertyProvider extends ChangeNotifier {
   //--------------END OF SORTING FUNCTION-----------------
 
 //-----------------add Property-------------
-  Future<void> addProperty(Property property) async {
+  Future<void> addProperty(
+      BuildContext context, Property property, List<File> images) async {
     final url = "https://bellasareas.firebaseio.com/properties.json";
-
+    List<String> fileName = [];
+    List<String> imageURL = [];
+    for (int i = 0; i != images.length; i++) {
+      fileName.add('property/${basename(images[i].path)}');
+      StorageReference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child(fileName[i]);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
+      var downloadURL =
+          await (await uploadTask.onComplete).ref.getDownloadURL();
+      imageURL.add(downloadURL.toString());
+    }
     try {
       final response = await http.post(url,
           body: json.encode({
-            "images": [],
+            "images": imageURL,
             "location": property.location,
             "price": property.price,
             "bathrooms": property.bathrooms,
@@ -185,9 +177,14 @@ class PropertyProvider extends ChangeNotifier {
             "ownerEmail": property.ownerEmail,
             "ownerName": property.ownerName,
           }));
+
+      propertyId = json.decode(response.body)['name'];
       final newProperty = Property(
-          id: DateTime.now().toString(),
-          images: [],
+          ownerName: "property.ownerName",
+          ownerEmail: "property.ownerName",
+          ownerContact: "property.ownerName",
+          id: propertyId,
+          images: imageURL,
           location: property.location,
           price: property.price,
           bathrooms: property.bathrooms,
@@ -204,28 +201,80 @@ class PropertyProvider extends ChangeNotifier {
   }
 
 //---------------------update Property------------
-  void updateProperty(String id, Property property) {
+  Future<void> updateProperty(String id, Property property) async {
     final propertyIndex = _property.indexWhere((property) => property.id == id);
-    if (propertyIndex >= 0) {
-      _property[propertyIndex] = property;
-      notifyListeners();
+    try {
+      if (propertyIndex >= 0) {
+        final url = "https://bellasareas.firebaseio.com/properties/$id.json";
+        await http.patch(url,
+            body: json.encode({
+              "images": [],
+              "location": property.location,
+              "price": property.price,
+              "bathrooms": property.bathrooms,
+              "floors": property.floors,
+              "category": property.category,
+              "roadAccess": property.roadAccess,
+              "area": property.area,
+              "totalRooms": property.totalRooms,
+              "ownerContact": "property.ownerContact",
+              "ownerEmail": "property.ownerEmail",
+              "ownerName": "property.ownerName",
+            }));
+        _property[propertyIndex] = property;
+        notifyListeners();
+      }
+    } catch (error) {
+      throw error;
     }
   }
 
 //---------------Upload photo to firebase Storage----------------------
-  Future uploadPhoto(BuildContext context, List<File> images) async {
-    List<String> fileName = [];
-//    final StorageReference firebaseStorageRef =
-//        FirebaseStorage.instance.ref().child('myImages.jpg');
-//    final StorageUploadTask task = firebaseStorageRef.putFile(images[0]);
+//   Future uploadPhoto(BuildContext context, List<File> images) async {
+//     List<String> fileName = [];
+// //    final StorageReference firebaseStorageRef =
+// //        FirebaseStorage.instance.ref().child('myImages.jpg');
+// //    final StorageUploadTask task = firebaseStorageRef.putFile(images[0]);
 
-    for (int i = 0; i != images.length; i++) {
-      fileName.add('property/${basename(images[i].path)}');
-      print(fileName[i]);
-      StorageReference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child(fileName[i]);
-      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
-      await uploadTask.onComplete;
+//     for (int i = 0; i != images.length; i++) {
+//       fileName.add('property/$propertyId/${basename(images[i].path)}');
+//       print(fileName[i]);
+//       StorageReference firebaseStorageRef =
+//           FirebaseStorage.instance.ref().child(fileName[i]);
+//       StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
+//       await uploadTask.onComplete;
+//     }
+//   }
+
+//--------------Fetch Properties from firebase----------
+  Future<void> fetchAndSetProperty() async {
+    final url = "https://bellasareas.firebaseio.com/properties.json";
+    try {
+      final response = await http.get(url);
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      print("-----------Extracted Data-------");
+      print(extractedData.toString());
+      final List<Property> loadedProperty = [];
+      extractedData.forEach((propertyId, propertyData) {
+        loadedProperty.add(Property(
+            id: propertyId,
+            location: propertyData["location"],
+            images: [],
+            bathrooms: propertyData["bathrooms"],
+            floors: propertyData["floors"],
+            ownerContact: propertyData["ownerContact"],
+            ownerEmail: propertyData["ownerEmail"],
+            ownerName: propertyData["ownerName"],
+            totalRooms: propertyData["totalRooms"],
+            price: propertyData["price"],
+            category: propertyData["category"],
+            area: propertyData["area"],
+            roadAccess: propertyData["roadAccess"]));
+      });
+      _property = loadedProperty;
+      notifyListeners();
+    } catch (error) {
+      throw (error);
     }
   }
 }

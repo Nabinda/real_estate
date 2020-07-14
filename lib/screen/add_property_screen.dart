@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/category_provider.dart';
 import 'package:bellasareas/provider/district_provider.dart';
-import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
+import 'package:flutter/material.dart';
+import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/widgets/category_dropdown.dart';
 import 'package:bellasareas/widgets/district_dropdown.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -60,7 +60,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
             initValues["location"];
       }
     }
-    isInit = true;
+    isInit = false;
   }
 
   bool isInit = true;
@@ -103,7 +103,6 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     });
   }
 
-  String cat;
   var _editedProperty = Property(
       id: null,
       roadAccess: 0,
@@ -118,15 +117,18 @@ class _EditAddPropertyState extends State<EditAddProperty> {
       totalRooms: 0,
       floors: 0,
       bathrooms: 0);
+  bool isLoading = false;
 
-//-----------------to get image from storage----------
+//-----------------to get image from mobile storage----------
   Future getImage(bool isCamera) async {
     File image;
 
     if (isCamera) {
-      image = await ImagePicker.pickImage(source: ImageSource.camera);
+      image = await ImagePicker.pickImage(
+          source: ImageSource.camera, imageQuality: 50);
     } else {
-      image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      image = await ImagePicker.pickImage(
+          source: ImageSource.gallery, imageQuality: 50);
     }
 
     setState(() {
@@ -201,24 +203,61 @@ class _EditAddPropertyState extends State<EditAddProperty> {
   }
 
   //-------Save form------------------
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _form.currentState.validate();
     if (!isValid) {
       return;
     }
-    if (_editedProperty.id != null) {
-      print("updated");
-      Provider.of<PropertyProvider>(context, listen: false)
-          .updateProperty(_editedProperty.id, _editedProperty);
-    } else {
-      print("Added Value------------");
-      print(_editedProperty.category);
-      Provider.of<PropertyProvider>(context, listen: false)
-          .uploadPhoto(context, images);
-      Provider.of<PropertyProvider>(context, listen: false)
-          .addProperty(_editedProperty);
-    }
     _form.currentState.save();
+    setState(() {
+      isLoading = true;
+    });
+    if (_editedProperty.id != null) {
+      try {
+        await Provider.of<PropertyProvider>(context, listen: false)
+            .updateProperty(_editedProperty.id, _editedProperty);
+      } catch (error) {
+        await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                  title: Text("Error Occurred"),
+                  content: Text(
+                      "Something has occurred! Property couldn't be updated"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                ));
+      }
+    } else {
+      try {
+        await Provider.of<PropertyProvider>(context, listen: false)
+            .addProperty(context, _editedProperty, images);
+      } catch (error) {
+        await showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                  title: Text("Error Occurred"),
+                  content: Text(
+                      "Something has occurred! Property couldn't be added"),
+                  actions: <Widget>[
+                    FlatButton(
+                      child: Text("OK"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    )
+                  ],
+                ));
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
     Navigator.of(context).pushNamed(OverViewScreen.routeName);
   }
 
@@ -236,480 +275,510 @@ class _EditAddPropertyState extends State<EditAddProperty> {
         color: Colors.blueGrey,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
-      child: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: 30),
-            //---------------------------------Custom App Bar-------------------
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 10),
-              decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey[800],
-                      offset: Offset(0, 5),
-                      blurRadius: 10.0,
-                    ),
-                  ],
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: Column(
                 children: <Widget>[
-                  _editedProperty.id != null
-                      ? IconButton(
+                  SizedBox(height: 30),
+                  //---------------------------------Custom App Bar-------------------
+                  Container(
+                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey[800],
+                            offset: Offset(0, 5),
+                            blurRadius: 10.0,
+                          ),
+                        ],
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        _editedProperty.id != null
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: Colors.purple[500],
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              )
+                            : isDrawerOpen
+                                ? IconButton(
+                                    icon: Icon(
+                                      Icons.arrow_back_ios,
+                                      color: Colors.purple[500],
+                                    ),
+                                    onPressed: () {
+                                      closeDrawer();
+                                    },
+                                  )
+                                : IconButton(
+                                    icon: Icon(
+                                      Icons.menu,
+                                      color: Colors.purple[500],
+                                    ),
+                                    onPressed: () {
+                                      openDrawer();
+                                    },
+                                  ),
+                        Text(
+                          "Bellas Areas",
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        IconButton(
                           icon: Icon(
-                            Icons.arrow_back_ios,
+                            Icons.check,
                             color: Colors.purple[500],
                           ),
                           onPressed: () {
-                            Navigator.of(context).pop();
+                            _saveForm();
                           },
                         )
-                      : isDrawerOpen
-                          ? IconButton(
-                              icon: Icon(
-                                Icons.arrow_back_ios,
-                                color: Colors.purple[500],
-                              ),
-                              onPressed: () {
-                                closeDrawer();
-                              },
-                            )
-                          : IconButton(
-                              icon: Icon(
-                                Icons.menu,
-                                color: Colors.purple[500],
-                              ),
-                              onPressed: () {
-                                openDrawer();
-                              },
-                            ),
-                  Text(
-                    "Bellas Areas",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.check,
-                      color: Colors.purple[500],
+                      ],
                     ),
-                    onPressed: () {
-                      _saveForm();
-                    },
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  //-----------------Body Part--------------
+                  IgnorePointer(
+                    ignoring: isDrawerOpen,
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Categories:",
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            CategoryDropDown(),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Location:",
+                              style:
+                                  TextStyle(fontSize: 18, color: Colors.white),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            DistrictDropDown(),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        //----------------Image Adding-----------------------------
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Images",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Container(
+                              width: 130,
+                              decoration: BoxDecoration(
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: Colors.grey,
+                                      offset: Offset(0, 1),
+                                      blurRadius: 2),
+                                ],
+                                gradient: LinearGradient(colors: [
+                                  Colors.purple[900],
+                                  Colors.purple[600],
+                                  Colors.purple[300],
+                                ]),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ListTile(
+                                onTap: () {
+                                  chooseOption(context);
+                                },
+                                title: Text(
+                                  "Add",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                leading: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        isImage
+                            ? Container(
+                                color: Colors.blueGrey,
+                                height: 150,
+                                width: MediaQuery.of(context).size.width * 0.82,
+                                child: Expanded(
+                                  child: ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: images.length,
+                                      itemBuilder: (ctx, index) => Stack(
+                                            alignment: Alignment.topRight,
+                                            children: <Widget>[
+                                              Container(
+                                                padding: EdgeInsets.all(0.0),
+                                                width: 150,
+                                                height: 150,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      width: 1,
+                                                      color: Colors.grey),
+                                                ),
+                                                alignment: Alignment.center,
+                                                child: Image.file(
+                                                  images[index],
+                                                  fit: BoxFit.cover,
+                                                  width: double.infinity,
+                                                ),
+                                              ),
+                                              Positioned(
+                                                top: -10,
+                                                right: -10,
+                                                child: IconButton(
+                                                  onPressed: () {
+                                                    clearImage(index);
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.clear,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          )),
+                                ),
+                              )
+                            : Container(
+                                height: 0,
+                                width: 0,
+                              ),
+                        //----------------------Form of other Information-------------------
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.85,
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Form(
+                            key: _form,
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                TextFormField(
+                                  cursorColor: Colors.white,
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white),
+                                  maxLines: 1,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white)),
+                                      labelText: "Area (in anna)",
+                                      labelStyle:
+                                          TextStyle(color: Colors.white)),
+                                  initialValue: initValues['area'],
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return "Should not be empty";
+                                    }
+                                    if (double.tryParse(value) == null) {
+                                      return "Value must be in numeric term";
+                                    }
+                                    if (double.parse(value) <= 0) {
+                                      return "Value should not be less than zero";
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (userInput) {
+                                    _editedProperty = Property(
+                                        id: _editedProperty.id,
+                                        roadAccess: _editedProperty.roadAccess,
+                                        area: userInput,
+                                        ownerName: _editedProperty.ownerName,
+                                        ownerEmail: _editedProperty.ownerEmail,
+                                        ownerContact:
+                                            _editedProperty.ownerContact,
+                                        category: category,
+                                        price: _editedProperty.price,
+                                        location: selectedLocation,
+                                        images: _editedProperty.images,
+                                        totalRooms: _editedProperty.totalRooms,
+                                        floors: _editedProperty.floors,
+                                        bathrooms: _editedProperty.bathrooms);
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 7,
+                                ),
+                                TextFormField(
+                                  cursorColor: Colors.white,
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white),
+                                  maxLines: 1,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white)),
+                                      labelText: "Total Price (in Rs)",
+                                      labelStyle:
+                                          TextStyle(color: Colors.white)),
+                                  initialValue: initValues['price'],
+                                  onSaved: (value) {
+                                    _editedProperty = Property(
+                                        area: _editedProperty.area,
+                                        images: _editedProperty.images,
+                                        location: _editedProperty.location,
+                                        price: double.parse(value),
+                                        category: _editedProperty.category,
+                                        roadAccess: _editedProperty.roadAccess,
+                                        id: _editedProperty.id);
+                                  },
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return "Should not be empty";
+                                    }
+                                    if (double.tryParse(value) == null) {
+                                      return "Value must be in numeric term";
+                                    }
+                                    if (double.parse(value) <= 0) {
+                                      return "Value should not be less than zero";
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 7,
+                                ),
+                                TextFormField(
+                                  validator: (value) {
+                                    if (value.isEmpty) {
+                                      return "Should not be empty";
+                                    }
+                                    if (double.tryParse(value) == null) {
+                                      return "Value must be in numeric term";
+                                    }
+                                    if (double.parse(value) <= 0) {
+                                      return "Value should not be less than zero";
+                                    }
+                                    return null;
+                                  },
+                                  onSaved: (value) {
+                                    _editedProperty = Property(
+                                        area: _editedProperty.area,
+                                        images: _editedProperty.images,
+                                        location: _editedProperty.location,
+                                        price: _editedProperty.price,
+                                        category: _editedProperty.category,
+                                        roadAccess: double.parse(value),
+                                        id: _editedProperty.id);
+                                  },
+                                  cursorColor: Colors.white,
+                                  keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.white),
+                                  maxLines: 1,
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide:
+                                              BorderSide(color: Colors.white)),
+                                      labelText: "Road Access(in km)",
+                                      labelStyle:
+                                          TextStyle(color: Colors.white)),
+                                  initialValue: initValues['roadAccess'],
+                                ),
+                                SizedBox(
+                                  height: 7,
+                                ),
+
+                                //------------------------Further form for gathering building information-------------------
+                                category == "Lands"
+                                    ? Container()
+                                    : Column(
+                                        children: <Widget>[
+                                          TextFormField(
+                                            onSaved: (value) {
+                                              _editedProperty = Property(
+                                                  area: _editedProperty.area,
+                                                  images:
+                                                      _editedProperty.images,
+                                                  location:
+                                                      _editedProperty.location,
+                                                  price: _editedProperty.price,
+                                                  category:
+                                                      _editedProperty.category,
+                                                  roadAccess: _editedProperty
+                                                      .roadAccess,
+                                                  id: _editedProperty.id,
+                                                  floors: int.parse(value));
+                                            },
+                                            validator: (value) {
+                                              if (value.isEmpty) {
+                                                return "Should not be empty";
+                                              }
+                                              if (double.tryParse(value) ==
+                                                  null) {
+                                                return "Value must be in numeric term";
+                                              }
+                                              if (double.parse(value) <= 0) {
+                                                return "Value should not be less than zero";
+                                              }
+                                              return null;
+                                            },
+                                            cursorColor: Colors.white,
+                                            keyboardType: TextInputType.number,
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white),
+                                            maxLines: 1,
+                                            decoration: InputDecoration(
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.white)),
+                                                labelText: "Floors",
+                                                labelStyle: TextStyle(
+                                                    color: Colors.white)),
+                                            initialValue: initValues['floor'],
+                                          ),
+                                          SizedBox(
+                                            height: 7,
+                                          ),
+                                          TextFormField(
+                                            onSaved: (value) {
+                                              _editedProperty = Property(
+                                                  area: _editedProperty.area,
+                                                  images:
+                                                      _editedProperty.images,
+                                                  location:
+                                                      _editedProperty.location,
+                                                  price: _editedProperty.price,
+                                                  category:
+                                                      _editedProperty.category,
+                                                  roadAccess: _editedProperty
+                                                      .roadAccess,
+                                                  id: _editedProperty.id,
+                                                  bathrooms: int.parse(value));
+                                            },
+                                            validator: (value) {
+                                              if (value.isEmpty) {
+                                                return "Should not be empty";
+                                              }
+                                              if (double.tryParse(value) ==
+                                                  null) {
+                                                return "Value must be in numeric term";
+                                              }
+                                              if (double.parse(value) <= 0) {
+                                                return "Value should not be less than zero";
+                                              }
+                                              return null;
+                                            },
+                                            cursorColor: Colors.white,
+                                            keyboardType: TextInputType.number,
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white),
+                                            maxLines: 1,
+                                            decoration: InputDecoration(
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.white)),
+                                                labelText: "Bathrooms",
+                                                labelStyle: TextStyle(
+                                                    color: Colors.white)),
+                                            initialValue:
+                                                initValues['bathroom'],
+                                          ),
+                                          SizedBox(
+                                            height: 7,
+                                          ),
+                                          TextFormField(
+                                            onSaved: (value) {
+                                              _editedProperty = Property(
+                                                  area: _editedProperty.area,
+                                                  images:
+                                                      _editedProperty.images,
+                                                  location:
+                                                      _editedProperty.location,
+                                                  price: _editedProperty.price,
+                                                  category:
+                                                      _editedProperty.category,
+                                                  roadAccess: _editedProperty
+                                                      .roadAccess,
+                                                  id: _editedProperty.id,
+                                                  totalRooms: int.parse(value));
+                                            },
+                                            validator: (value) {
+                                              if (value.isEmpty) {
+                                                return "Should not be empty";
+                                              }
+                                              if (double.tryParse(value) ==
+                                                  null) {
+                                                return "Value must be in numeric term";
+                                              }
+                                              if (double.parse(value) <= 0) {
+                                                return "Value should not be less than zero";
+                                              }
+                                              return null;
+                                            },
+                                            cursorColor: Colors.white,
+                                            keyboardType: TextInputType.number,
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                color: Colors.white),
+                                            maxLines: 1,
+                                            decoration: InputDecoration(
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                        borderSide: BorderSide(
+                                                            color:
+                                                                Colors.white)),
+                                                labelText: "Total Rooms",
+                                                labelStyle: TextStyle(
+                                                    color: Colors.white)),
+                                            initialValue:
+                                                initValues['totalRooms'],
+                                          ),
+                                        ],
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   )
                 ],
               ),
             ),
-            SizedBox(
-              height: 10,
-            ),
-            //-----------------Body Part--------------
-            IgnorePointer(
-              ignoring: isDrawerOpen,
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Categories:",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      CategoryDropDown(),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Location:",
-                        style: TextStyle(fontSize: 18, color: Colors.white),
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      DistrictDropDown(),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  //----------------Image Adding-----------------------------
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "Images",
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                      SizedBox(
-                        width: 20,
-                      ),
-                      Container(
-                        width: 130,
-                        decoration: BoxDecoration(
-                          boxShadow: [
-                            BoxShadow(
-                                color: Colors.grey,
-                                offset: Offset(0, 1),
-                                blurRadius: 2),
-                          ],
-                          gradient: LinearGradient(colors: [
-                            Colors.purple[900],
-                            Colors.purple[600],
-                            Colors.purple[300],
-                          ]),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: ListTile(
-                          onTap: () {
-                            chooseOption(context);
-                          },
-                          title: Text(
-                            "Add",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          leading: Icon(
-                            Icons.add,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  isImage
-                      ? Container(
-                          color: Colors.blueGrey,
-                          height: 150,
-                          width: MediaQuery.of(context).size.width * 0.82,
-                          child: Expanded(
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: images.length,
-                                itemBuilder: (ctx, index) => Stack(
-                                      alignment: Alignment.topRight,
-                                      children: <Widget>[
-                                        Container(
-                                          padding: EdgeInsets.all(0.0),
-                                          width: 150,
-                                          height: 150,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                width: 1, color: Colors.grey),
-                                          ),
-                                          alignment: Alignment.center,
-                                          child: Image.file(
-                                            images[index],
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: -10,
-                                          right: -10,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              clearImage(index);
-                                            },
-                                            icon: Icon(
-                                              Icons.clear,
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    )),
-                          ),
-                        )
-                      : Container(
-                          height: 0,
-                          width: 0,
-                        ),
-                  //----------------------Form of other Information-------------------
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.85,
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Form(
-                      key: _form,
-                      child: Column(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextFormField(
-                            cursorColor: Colors.white,
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                            maxLines: 1,
-                            decoration: InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                labelText: "Area (in anna)",
-                                labelStyle: TextStyle(color: Colors.white)),
-                            initialValue: initValues['area'],
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return "Should not be empty";
-                              }
-                              if (double.tryParse(value) == null) {
-                                return "Value must be in numeric term";
-                              }
-                              if (double.parse(value) <= 0) {
-                                return "Value should not be less than zero";
-                              }
-                              return null;
-                            },
-                            onSaved: (userInput) {
-                              _editedProperty = Property(
-                                  id: _editedProperty.id,
-                                  roadAccess: _editedProperty.roadAccess,
-                                  area: userInput,
-                                  ownerName: _editedProperty.ownerName,
-                                  ownerEmail: _editedProperty.ownerEmail,
-                                  ownerContact: _editedProperty.ownerContact,
-                                  category: category,
-                                  price: _editedProperty.price,
-                                  location: selectedLocation,
-                                  images: _editedProperty.images,
-                                  totalRooms: _editedProperty.totalRooms,
-                                  floors: _editedProperty.floors,
-                                  bathrooms: _editedProperty.bathrooms);
-
-                              // _editedProperty = Property(
-                              //     area: userInput,
-                              //     images: _editedProperty.images,
-                              //     location: selectedLocation,
-                              //     price: _editedProperty.price,
-                              //     category: category,
-                              //     roadAccess: _editedProperty.roadAccess,
-                              //     id: _editedProperty.id);
-                            },
-                          ),
-                          SizedBox(
-                            height: 7,
-                          ),
-                          TextFormField(
-                            cursorColor: Colors.white,
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                            maxLines: 1,
-                            decoration: InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                labelText: "Total Price (in Rs)",
-                                labelStyle: TextStyle(color: Colors.white)),
-                            initialValue: initValues['price'],
-                            onSaved: (value) {
-                              _editedProperty = Property(
-                                  area: _editedProperty.area,
-                                  images: _editedProperty.images,
-                                  location: _editedProperty.location,
-                                  price: double.parse(value),
-                                  category: _editedProperty.category,
-                                  roadAccess: _editedProperty.roadAccess,
-                                  id: _editedProperty.id);
-                            },
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return "Should not be empty";
-                              }
-                              if (double.tryParse(value) == null) {
-                                return "Value must be in numeric term";
-                              }
-                              if (double.parse(value) <= 0) {
-                                return "Value should not be less than zero";
-                              }
-                              return null;
-                            },
-                          ),
-                          SizedBox(
-                            height: 7,
-                          ),
-                          TextFormField(
-                            validator: (value) {
-                              if (value.isEmpty) {
-                                return "Should not be empty";
-                              }
-                              if (double.tryParse(value) == null) {
-                                return "Value must be in numeric term";
-                              }
-                              if (double.parse(value) <= 0) {
-                                return "Value should not be less than zero";
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              _editedProperty = Property(
-                                  area: _editedProperty.area,
-                                  images: _editedProperty.images,
-                                  location: _editedProperty.location,
-                                  price: _editedProperty.price,
-                                  category: _editedProperty.category,
-                                  roadAccess: double.parse(value),
-                                  id: _editedProperty.id);
-                            },
-                            cursorColor: Colors.white,
-                            keyboardType: TextInputType.number,
-                            style: TextStyle(fontSize: 18, color: Colors.white),
-                            maxLines: 1,
-                            decoration: InputDecoration(
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                labelText: "Road Access(in km)",
-                                labelStyle: TextStyle(color: Colors.white)),
-                            initialValue: initValues['roadAccess'],
-                          ),
-                          SizedBox(
-                            height: 7,
-                          ),
-
-                          //------------------------Further form for gathering building information-------------------
-                          category == "Lands"
-                              ? Container()
-                              : Column(
-                                  children: <Widget>[
-                                    TextFormField(
-                                      onSaved: (value) {
-                                        _editedProperty = Property(
-                                            area: _editedProperty.area,
-                                            images: _editedProperty.images,
-                                            location: _editedProperty.location,
-                                            price: _editedProperty.price,
-                                            category: _editedProperty.category,
-                                            roadAccess:
-                                                _editedProperty.roadAccess,
-                                            id: _editedProperty.id,
-                                            floors: int.parse(value));
-                                      },
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return "Should not be empty";
-                                        }
-                                        if (double.tryParse(value) == null) {
-                                          return "Value must be in numeric term";
-                                        }
-                                        if (double.parse(value) <= 0) {
-                                          return "Value should not be less than zero";
-                                        }
-                                        return null;
-                                      },
-                                      cursorColor: Colors.white,
-                                      keyboardType: TextInputType.number,
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.white),
-                                      maxLines: 1,
-                                      decoration: InputDecoration(
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          labelText: "Floors",
-                                          labelStyle:
-                                              TextStyle(color: Colors.white)),
-                                      initialValue: initValues['floor'],
-                                    ),
-                                    SizedBox(
-                                      height: 7,
-                                    ),
-                                    TextFormField(
-                                      onSaved: (value) {
-                                        _editedProperty = Property(
-                                            area: _editedProperty.area,
-                                            images: _editedProperty.images,
-                                            location: _editedProperty.location,
-                                            price: _editedProperty.price,
-                                            category: _editedProperty.category,
-                                            roadAccess:
-                                                _editedProperty.roadAccess,
-                                            id: _editedProperty.id,
-                                            bathrooms: int.parse(value));
-                                      },
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return "Should not be empty";
-                                        }
-                                        if (double.tryParse(value) == null) {
-                                          return "Value must be in numeric term";
-                                        }
-                                        if (double.parse(value) <= 0) {
-                                          return "Value should not be less than zero";
-                                        }
-                                        return null;
-                                      },
-                                      cursorColor: Colors.white,
-                                      keyboardType: TextInputType.number,
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.white),
-                                      maxLines: 1,
-                                      decoration: InputDecoration(
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          labelText: "Bathrooms",
-                                          labelStyle:
-                                              TextStyle(color: Colors.white)),
-                                      initialValue: initValues['bathroom'],
-                                    ),
-                                    SizedBox(
-                                      height: 7,
-                                    ),
-                                    TextFormField(
-                                      onSaved: (value) {
-                                        _editedProperty = Property(
-                                            area: _editedProperty.area,
-                                            images: _editedProperty.images,
-                                            location: _editedProperty.location,
-                                            price: _editedProperty.price,
-                                            category: _editedProperty.category,
-                                            roadAccess:
-                                                _editedProperty.roadAccess,
-                                            id: _editedProperty.id,
-                                            totalRooms: int.parse(value));
-                                      },
-                                      validator: (value) {
-                                        if (value.isEmpty) {
-                                          return "Should not be empty";
-                                        }
-                                        if (double.tryParse(value) == null) {
-                                          return "Value must be in numeric term";
-                                        }
-                                        if (double.parse(value) <= 0) {
-                                          return "Value should not be less than zero";
-                                        }
-                                        return null;
-                                      },
-                                      cursorColor: Colors.white,
-                                      keyboardType: TextInputType.number,
-                                      style: TextStyle(
-                                          fontSize: 18, color: Colors.white),
-                                      maxLines: 1,
-                                      decoration: InputDecoration(
-                                          focusedBorder: OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Colors.white)),
-                                          labelText: "Total Rooms",
-                                          labelStyle:
-                                              TextStyle(color: Colors.white)),
-                                      initialValue: initValues['totalRooms'],
-                                    ),
-                                  ],
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 }

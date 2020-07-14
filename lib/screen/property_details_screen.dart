@@ -3,7 +3,6 @@ import 'package:bellasareas/widgets/property_image_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:toast/toast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PropertyDetailsScreen extends StatelessWidget {
@@ -27,10 +26,6 @@ class PropertyDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void showToast(String msg, {int duration, int gravity}) {
-      Toast.show(msg, context, duration: duration, gravity: gravity);
-    }
-
     final provider = Provider.of<PropertyProvider>(context);
     final id = ModalRoute.of(context).settings.arguments.toString();
     final property =
@@ -219,7 +214,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                                         width: 10.0,
                                       ),
                                       Text(
-                                        property.area,
+                                        property.area.toString(),
                                         style: TextStyle(fontSize: 18),
                                       )
                                     ],
@@ -268,7 +263,11 @@ class PropertyDetailsScreen extends StatelessWidget {
                                                   width: 10.0,
                                                 ),
                                                 Text(
-                                                  property.floors.toString(),
+                                                  property.category !=
+                                                          "Buildings"
+                                                      ? "floors"
+                                                      : property.floors
+                                                          .toString(),
                                                   style:
                                                       TextStyle(fontSize: 18),
                                                 )
@@ -293,7 +292,11 @@ class PropertyDetailsScreen extends StatelessWidget {
                                                   width: 10.0,
                                                 ),
                                                 Text(
-                                                  property.bathrooms.toString(),
+                                                  property.category !=
+                                                          "Buildings"
+                                                      ? "bathroom"
+                                                      : property.bathrooms
+                                                          .toString(),
                                                   style:
                                                       TextStyle(fontSize: 18),
                                                 )
@@ -310,7 +313,10 @@ class PropertyDetailsScreen extends StatelessWidget {
                                                   width: 15.0,
                                                 ),
                                                 Text(
-                                                  "Total Rooms :",
+                                                  property.category !=
+                                                          "Buildings"
+                                                      ? "room"
+                                                      : "Total Rooms :",
                                                   style:
                                                       TextStyle(fontSize: 18),
                                                 ),
@@ -361,7 +367,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                                         width: 10.0,
                                       ),
                                       Text(
-                                        property.ownerName,
+                                        "property.ownerName",
                                         style: TextStyle(fontSize: 18),
                                       )
                                     ],
@@ -383,7 +389,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                                         width: 10.0,
                                       ),
                                       Text(
-                                        property.ownerEmail,
+                                        "property.ownerEmail",
                                         style: TextStyle(fontSize: 18),
                                       )
                                     ],
@@ -405,7 +411,7 @@ class PropertyDetailsScreen extends StatelessWidget {
                                         width: 10.0,
                                       ),
                                       Text(
-                                        property.ownerContact,
+                                        "property.ownerContact",
                                         style: TextStyle(fontSize: 18),
                                       )
                                     ],

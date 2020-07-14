@@ -9,10 +9,7 @@ import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';
 import 'package:bellasareas/screen/wishlist_screen.dart';
-import 'package:flare_splash_screen/flare_splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_page_transition/flutter_page_transition.dart';
-import 'package:flutter_page_transition/page_transition_type.dart';
 import 'package:provider/provider.dart';
 
 void main() {

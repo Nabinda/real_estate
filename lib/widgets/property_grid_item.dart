@@ -1,9 +1,6 @@
-import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-
-class ScreenArguments {}
 
 class PropertyGridItem extends StatelessWidget {
   final String id;
