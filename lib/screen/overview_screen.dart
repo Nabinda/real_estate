@@ -16,7 +16,7 @@ class _OverViewScreenState extends State<OverViewScreen> {
   double yOffSet = 0;
   double scaleFactor = 1;
   bool isDrawerOpen = false;
-  bool _isInit = true;
+  bool _isInit = true; // true
   bool _isLoading = false;
   @override
   void didChangeDependencies() {

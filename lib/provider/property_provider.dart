@@ -8,81 +8,7 @@ import 'package:http/http.dart' as http;
 
 class PropertyProvider extends ChangeNotifier {
   String propertyId;
-  List<Property> _property = [
-    // Property(
-    //   id: "1",
-    //   location: "Kathmandu",
-    //   area: "0-0-4-0",
-    //   roadAccess: 0.2,
-    //   bathrooms: 4,
-    //   floors: 3,
-    //   totalRooms: 20,
-    //   price: 2000000,
-    //   category: "Buildings",
-    //   images: [
-    //     "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-    //     "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-    //     "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-    //   ],
-    //   ownerContact: "9800223355",
-    //   ownerEmail: "abc@def.com",
-    //   ownerName: "ABC",
-    // ),
-    // Property(
-    //   id: "2",
-    //   location: "Kaski",
-    //   area: "0-0-4-0",
-    //   roadAccess: 0.2,
-    //   bathrooms: 4,
-    //   floors: 3,
-    //   totalRooms: 20,
-    //   price: 200000,
-    //   category: "Buildings",
-    //   images: [
-    //     "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-    //     "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-    //     "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-    //   ],
-    //   ownerContact: "9800223355",
-    //   ownerEmail: "abc@def.com",
-    //   ownerName: "ABC",
-    // ),
-    // Property(
-    //   id: "3",
-    //   location: "Lalitpur",
-    //   price: 20000,
-    //   category: "Buildings",
-    //   images: [
-    //     "https://www.buildingplanner.in/images/ready-plans/34N1002.jpg",
-    //     "https://i.pinimg.com/originals/15/80/00/158000569778be8206e39ee8af249028.jpg",
-    //     "https://sbdnepal.com/wp-content/uploads/2019/01/Building-Design-Innovative-and-Functional.jpg"
-    //   ],
-    //   ownerContact: "9800223355",
-    //   ownerEmail: "abc@def.com",
-    //   ownerName: "ABC",
-    //   area: "0-0-4-0",
-    //   roadAccess: 0.2,
-    //   bathrooms: 4,
-    //   floors: 3,
-    //   totalRooms: 20,
-    // ),
-    // Property(
-    //   id: "4",
-    //   ownerName: "XYZ",
-    //   ownerEmail: "XYZ@xyz.com",
-    //   ownerContact: "98203652133",
-    //   category: "Lands",
-    //   price: 88888,
-    //   location: "Kathmandu",
-    //   images: [
-    //     "https://www.tni.org/files/styles/content_full_width/public/mspp.jpeg?itok=iWMByTJ3",
-    //     "https://upload.wikimedia.org/wikipedia/commons/c/c4/Pennsylvania_State_Game_Lands_Number_226_sign.JPG",
-    //     "https://lh3.googleusercontent.com/proxy/QB-rj-wbg6tNrpVyvUTbrC0EzlboAm1Q3w3AI3lKmSNuawuHQ2aeEDE1MqjK51flE8UlF98QkEQ6pRMaZ40JCgZNnPYm9F9DoGtrc4Y5o9M8efdXrpuXnIuu1Py5lctnAFzVcEo"
-    //   ],
-    //   area: "0-0-4-0",
-    //   roadAccess: 0.2,
-    // )
-  ];
+  List<Property> _property = [];
   List<Property> _wishList = [];
   List<Property> get properties {
     return [..._property];
@@ -217,14 +143,28 @@ class PropertyProvider extends ChangeNotifier {
   }
 
 //---------------------update Property------------
-  Future<void> updateProperty(String id, Property property) async {
+  Future<void> updateProperty(
+      String id, Property property, List<File> images) async {
     final propertyIndex = _property.indexWhere((property) => property.id == id);
+    List<String> fileName = [];
+    List<String> imageURL = [];
+    for (int i = 0; i != images.length; i++) {
+      fileName.add('property/${basename(images[i].path)}');
+      StorageReference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child(fileName[i]);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
+      var downloadURL =
+          await (await uploadTask.onComplete).ref.getDownloadURL();
+      print("------------------Updated Image URL----------------------");
+      print(downloadURL.toString());
+      imageURL.add(downloadURL.toString());
+    }
     try {
       if (propertyIndex >= 0) {
         final url = "https://bellasareas.firebaseio.com/properties/$id.json";
         await http.patch(url,
             body: json.encode({
-              "images": [],
+              "images": imageURL,
               "location": property.location,
               "price": property.price,
               "bathrooms": property.bathrooms,
@@ -265,11 +205,12 @@ class PropertyProvider extends ChangeNotifier {
 //--------------Fetch Properties from firebase----------
   Future<void> fetchAndSetProperty() async {
     final url = "https://bellasareas.firebaseio.com/properties.json";
+    print("fetching");
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      print("-----------Extracted Data-------");
-      print(extractedData.toString());
+      // print("-----------Extracted Data-------");
+      // print(extractedData.toString());
       final List<Property> loadedProperty = [];
       extractedData.forEach((propertyId, propertyData) {
         loadedProperty.add(Property(

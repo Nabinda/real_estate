@@ -1,6 +1,8 @@
 import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
+import 'package:bellasareas/screen/login.dart';
+import 'package:bellasareas/screen/login_signup.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,7 +15,7 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
-  bool isLogin = true;
+  bool isLogin = false;
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -32,6 +34,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            //-----------Profile------------------
             Row(
               children: <Widget>[
                 CircleAvatar(
@@ -75,6 +78,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 )
               ],
             ),
+
+            //----------App Drawer Menu Items------------
             Column(
               children: <Widget>[
                 ListTile(
@@ -132,8 +137,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
                 ListTile(
                   onTap: () {
+                    isLogin?
                     Navigator.of(context)
-                        .pushNamed(EditViewScreenHomePage.routeName);
+                        .pushNamed(EditViewScreenHomePage.routeName):
+                        Navigator.of(context).pushNamed(Login.routName);
                   },
                   leading:
                       FaIcon(FontAwesomeIcons.landmark, color: Colors.white),
@@ -144,8 +151,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                 ),
                 ListTile(
                   onTap: () {
+                    isLogin?
                     Navigator.of(context)
-                        .pushNamed(EditAddPropertyScreen.routeName);
+                        .pushNamed(EditAddPropertyScreen.routeName):
+                        Navigator.of(context).pushNamed(Login.routName);
                   },
                   leading: Icon(Icons.add, color: Colors.white),
                   title: Text(
@@ -171,9 +180,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                     children: <Widget>[
                       GestureDetector(
                         onTap: () {
-                          setState(() {
-                            isLogin = true;
-                          });
+                         Navigator.of(context).pushNamed(Login.routName);
                         },
                         child: Text("Log In",
                             style:
@@ -190,8 +197,13 @@ class _DrawerScreenState extends State<DrawerScreen> {
                       SizedBox(
                         width: 10,
                       ),
-                      Text("Sign Up",
-                          style: TextStyle(color: Colors.white, fontSize: 16))
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.of(context).pushNamed(SignUp.routeName,arguments: "signup");
+                        },
+                                              child: Text("Sign Up",
+                            style: TextStyle(color: Colors.white, fontSize: 16)),
+                      )
                     ],
                   )
           ],

@@ -74,7 +74,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
   bool isDrawerOpen = false;
   bool isLoading = false;
 
-  var initValues = {
+  Map<String, dynamic> initValues = {
     "category": "Lands",
     "location": "Kathmandu",
     "roadAccess": "",
@@ -216,7 +216,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     if (_editedProperty.id != null) {
       try {
         await Provider.of<PropertyProvider>(context, listen: false)
-            .updateProperty(_editedProperty.id, _editedProperty);
+            .updateProperty(_editedProperty.id, _editedProperty, images);
       } catch (error) {
         await showDialog(
             context: context,
