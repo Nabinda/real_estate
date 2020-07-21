@@ -38,7 +38,7 @@ dependencies:
   #for calls and sending emails
   url_launcher: ^5.4.11
   firebase_storage: ^3.1.6
-  firebase_auth: ^0.16.1
+  shared_preferences: ^0.5.7+3
   flare_splash_screen: ^3.0.1
 
 dev_dependencies:

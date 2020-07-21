@@ -1,7 +1,7 @@
-
+import 'package:bellasareas/exception/http_exception.dart';
+import 'package:bellasareas/main.dart';
 import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,67 +19,50 @@ class _LoginState extends State<Login> {
   String _email;
   String _password;
   bool _isLoading = false;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  Future<FirebaseUser> _handleSignIn() async{
-    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(email: _email, password: _password)).user;
-    await Provider.of<AuthProvider>(context).fetchUser(user.uid);
-    return user;
+ void showErrorDialog(String errorDialog) {
+    showCupertinoDialog(context: context, builder: (ctx){
+              return CupertinoAlertDialog(
+                title: Text(errorDialog),
+                actions: <Widget>[
+                  CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
+                ],
+              );
+            });
   }
  Future<void> checkLogin() async{
+    if (!_form.currentState.validate()) {
+      // Invalid!
+      return;
+    }
+    _form.currentState.save();
     setState(() {
       _isLoading = true;
     });
-    if (_form.currentState.validate()) {
-      _form.currentState.save();
-      try {
-         _handleSignIn().then((authResult) {
-
-          Provider.of<AuthProvider>(context,listen: false).setLogin(true);
-          Navigator.pushReplacementNamed(context, OverViewScreen.routeName);
-        }).catchError((error) {
-           setState(() {
-             _isLoading = false;
-           });
-          print(error.code);
-          if(error.code=="ERROR_NETWORK_REQUEST_FAILED"){
-            return showCupertinoDialog(context: context, builder: (ctx){
-              return CupertinoAlertDialog(
-                title: Text("Please make sure your internet is working"),
-                actions: <Widget>[
-                  CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
-                ],
-              );
-            });
-          }
-          if (error.code == "ERROR_USER_NOT_FOUND") {
-            return showCupertinoDialog(context: context, builder: (ctx){
-              return CupertinoAlertDialog(
-                title: Text("Invalid Email!!!"),
-                actions: <Widget>[
-                  CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
-                ],
-              );
-            });
-          }
-          if (error.code == "ERROR_WRONG_PASSWORD") {
-            return showCupertinoDialog(context: context, builder: (ctx){
-              return CupertinoAlertDialog(
-                title: Text("Invalid Password!!!"),
-                actions: <Widget>[
-                  CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
-                ],
-              );
-            });
-          }
-          setState(() {
-            _isLoading=false;
-          });
-          return null;
-        });
-      } catch (error) {
-        throw (error);
+    try{
+      await Provider.of<Auth>(context, listen: false)
+            .logIn(_email, _password);
+            Navigator.of(context).pushReplacementNamed(HomePage.routeName);
+    }on HttpException catch (error) {
+      var errorMessage = "Authentication Failed";
+      if (error.toString().contains("EMAIL_EXITS")) {
+        errorMessage = 'This email address is already in use.';
+      } else if (error.toString().contains("INVALID_EMAIL")) {
+        errorMessage = 'This is not a valid email address.';
+      } else if (error.toString().contains("WEAK_PASSWORD")) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains("EMAIL_NOT_FOUND")) {
+        errorMessage = "Email address doesn't exists.";
+      } else if (error.toString().contains("INVALID_PASSWORD")) {
+        errorMessage = 'Invalid password.';
       }
-    }
+      showErrorDialog(errorMessage);
+    
+  }catch(error){
+    throw(error);
+  }
+  setState(() {
+      _isLoading = false;
+    });
   }
 @override
   Widget build(BuildContext context) {

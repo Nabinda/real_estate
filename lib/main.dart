@@ -34,7 +34,7 @@ class SplashClass extends StatelessWidget {
           create: (_) => DistrictProvider(),
         ),
         ChangeNotifierProvider(
-          create: (_) => AuthProvider(),
+          create: (_) => Auth(),
         ),
       ],
       child: MaterialApp(
@@ -51,6 +51,7 @@ class SplashClass extends StatelessWidget {
           WishList.routeName: (ctx) => WishList(),
           SignUp.routeName: (ctx) => SignUp(),
           Login.routName:(ctx) => Login(),
+          HomePage.routeName:(ctx) => HomePage(),
         },
       ),
     );
@@ -58,6 +59,7 @@ class SplashClass extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
+  static const routeName = "/main_page";
   @override
   _HomePageState createState() => _HomePageState();
 }

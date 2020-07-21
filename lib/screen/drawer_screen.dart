@@ -1,6 +1,5 @@
 import 'package:bellasareas/main.dart';
 import 'package:bellasareas/model/user.dart';
-import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
@@ -11,7 +10,6 @@ import 'package:bellasareas/screen/search_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 
 class DrawerScreen extends StatefulWidget {
   @override
@@ -19,21 +17,14 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
+  bool isLogin = false;
   User user;
   String name= "Nabin Dangol";
   String email= "nabindeveloper@gmail.com";
- void ifLogin() {
-     user =  Provider.of<AuthProvider>(context).fetchedUser;
-     print(user.name);
-}
+ 
  @override
   Widget build(BuildContext context) {
-    bool isLogin = Provider.of<AuthProvider>(context,listen: false).login;
-
-    if(isLogin){
-       ifLogin();
- }
-
+   
   return SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -185,7 +176,6 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   ? GestureDetector(
                 onTap: () {
                   setState(() {
-                    Provider.of<AuthProvider>(context,listen: false).setLogin(false);
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>HomePage()));
                   });
                 },

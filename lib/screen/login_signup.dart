@@ -1,7 +1,7 @@
+import 'package:bellasareas/exception/http_exception.dart';
 import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/screen/login.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,72 +17,65 @@ class _SignUpState extends State<SignUp> {
   final _form = GlobalKey<FormState>();
   final passwordController = TextEditingController();
   bool _isLoading = false;
+  
   //-----------Information For Form-----------
   String _email;
   String _password;
   String _name;
   String _contact;
-  String _userId;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-Future<void> _handleSignUp() async{
-  final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(email: _email, password: _password)).user;
-_userId = user.uid;  
-  return user;
-}
 
-Future<void> signUp() async{
-  setState(() {
-    _isLoading = true;
-  });
-  print("signup");
-      if(_form.currentState.validate()){
-        _form.currentState.save();
-        try{
-     _handleSignUp().then((authResult) {
-             Provider.of<AuthProvider>(context,listen:false).addUser(_userId,_name,_contact,_email);
-          Navigator.pushReplacement(  
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => Login()));
-        }).catchError((error){
-          setState(() {
-          _isLoading = false;
-          });
-          print(error.code);
-          if(error.code=="ERROR_EMAIL_ALREADY_IN_USE"){
-            return showCupertinoDialog(context: context, builder: (ctx){
+
+  void showErrorDialog(String errorDialog) {
+    showCupertinoDialog(context: context, builder: (ctx){
               return CupertinoAlertDialog(
-                title: Text("Email already exists!!"),
+                title: Text(errorDialog),
                 actions: <Widget>[
                   CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
                 ],
               );
             });
-          }
-          if(error.code=="ERROR_NETWORK_REQUEST_FAILED"){
-            return showCupertinoDialog(context: context, builder: (ctx){
-              return CupertinoAlertDialog(
-                title: Text("Please make sure your internet is working"),
-                actions: <Widget>[
-                  CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
-                ],
-              );
-            });
-          }
-          setState(() {
-            _isLoading = false;
-          });
-          return null;
-        });
-        }
-        catch(error){
-          throw(error);
-        }
-      }
   }
+Future<void> signUp() async{
+    
+  if (!_form.currentState.validate()) {
+      // Invalid!
+      return;
+    }
+    _form.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
+    try{
+      await Provider.of<Auth>(context, listen: false)
+            .signUp(_email, _password,_contact,_name);
+
+    
+    }on HttpException catch (error) {
+      var errorMessage = "Authentication Failed";
+      if (error.toString().contains("EMAIL_EXITS")) {
+        errorMessage = 'This email address is already in use.';
+      } else if (error.toString().contains("INVALID_EMAIL")) {
+        errorMessage = 'This is not a valid email address.';
+      } else if (error.toString().contains("WEAK_PASSWORD")) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains("EMAIL_NOT_FOUND")) {
+        errorMessage = "Email address doesn't exists.";
+      } else if (error.toString().contains("INVALID_PASSWORD")) {
+        errorMessage = 'Invalid password.';
+      }
+      showErrorDialog(errorMessage);
+      
+  }catch(error){
+    throw(error);
+  }
+  setState(() {
+      _isLoading = false;
+    });
+}
 
   @override
   Widget build(BuildContext context) {
+  
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -95,7 +88,7 @@ Future<void> signUp() async{
                 Colors.purple[300],
               ]),
         ),
-        child: _isLoading?CircularProgressIndicator():Column(
+        child: _isLoading?Center(child: CircularProgressIndicator()):Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(
