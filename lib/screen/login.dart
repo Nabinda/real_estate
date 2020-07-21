@@ -1,9 +1,11 @@
-import 'package:bellasareas/main.dart';
+
+import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'login_signup.dart';
 
 class Login extends StatefulWidget {
@@ -16,19 +18,39 @@ class _LoginState extends State<Login> {
   final _form = GlobalKey<FormState>();
   String _email;
   String _password;
- void checkLogin() {
+  bool _isLoading = false;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  Future<FirebaseUser> _handleSignIn() async{
+    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(email: _email, password: _password)).user;
+    await Provider.of<AuthProvider>(context).fetchUser(user.uid);
+    return user;
+  }
+ Future<void> checkLogin() async{
+    setState(() {
+      _isLoading = true;
+    });
     if (_form.currentState.validate()) {
       _form.currentState.save();
       try {
-        FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: _email, password: _password)
-            .then((authResult) {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => HomePage()));
+         _handleSignIn().then((authResult) {
+
+          Provider.of<AuthProvider>(context,listen: false).setLogin(true);
+          Navigator.pushReplacementNamed(context, OverViewScreen.routeName);
         }).catchError((error) {
+           setState(() {
+             _isLoading = false;
+           });
           print(error.code);
+          if(error.code=="ERROR_NETWORK_REQUEST_FAILED"){
+            return showCupertinoDialog(context: context, builder: (ctx){
+              return CupertinoAlertDialog(
+                title: Text("Please make sure your internet is working"),
+                actions: <Widget>[
+                  CupertinoDialogAction(child: Text("OK"),onPressed:() {Navigator.pop(context);})
+                ],
+              );
+            });
+          }
           if (error.code == "ERROR_USER_NOT_FOUND") {
             return showCupertinoDialog(context: context, builder: (ctx){
               return CupertinoAlertDialog(
@@ -49,6 +71,9 @@ class _LoginState extends State<Login> {
               );
             });
           }
+          setState(() {
+            _isLoading=false;
+          });
           return null;
         });
       } catch (error) {
@@ -70,7 +95,9 @@ class _LoginState extends State<Login> {
                 Colors.purple[300],
               ]),
         ),
-        child: Column(
+        child:
+        _isLoading?Center(child: CircularProgressIndicator()):
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             SizedBox(

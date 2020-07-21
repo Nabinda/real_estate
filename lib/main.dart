@@ -1,3 +1,4 @@
+import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/provider/category_provider.dart';
 import 'package:bellasareas/provider/district_provider.dart';
 import 'package:bellasareas/provider/property_provider.dart';
@@ -31,6 +32,9 @@ class SplashClass extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => DistrictProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(),
         ),
       ],
       child: MaterialApp(
