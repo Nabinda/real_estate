@@ -1,15 +1,16 @@
-import 'package:bellasareas/main.dart';
+import 'dart:convert';
 import 'package:bellasareas/model/user.dart';
+import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/login.dart';
-import 'package:bellasareas/screen/login_signup.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DrawerScreen extends StatefulWidget {
   @override
@@ -17,14 +18,31 @@ class DrawerScreen extends StatefulWidget {
 }
 
 class _DrawerScreenState extends State<DrawerScreen> {
-  bool isLogin = false;
+
+  bool isInit = true;
   User user;
-  String name= "Nabin Dangol";
-  String email= "nabindeveloper@gmail.com";
- 
+  String name= "";
+  String email= "";
+  @override
+  void didChangeDependencies() {
+  if(isInit){
+      getUserData();
+    }
+  isInit = false;
+    super.didChangeDependencies();
+  }
+  void getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final extractedData =
+    json.decode(prefs.getString("userData")) as Map<String, Object>;
+    setState(() {
+      email = extractedData['email'];
+      name = extractedData['name'];
+    });
+  }
  @override
   Widget build(BuildContext context) {
-   
+
   return SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height,
@@ -41,17 +59,17 @@ class _DrawerScreenState extends State<DrawerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
+
               //-----------Profile------------------
               Row(
                 children: <Widget>[
+
                   CircleAvatar(
                     backgroundColor: Colors.greenAccent,
-                    backgroundImage: isLogin
-                        ? NetworkImage(
+
+                    backgroundImage: NetworkImage(
                         "https://www.tni.org/files/styles/content_full_width/public/mspp.jpeg?itok=iWMByTJ3")
-                        : AssetImage(
-                      "assets/images/bellasareas.PNG",
-                    ),
+
                   ),
                   SizedBox(
                     width: 10,
@@ -59,18 +77,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      isLogin
-                          ? Container():
-                           Text(
-                        "Developed By:",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            decoration: TextDecoration.underline),
-                      ),
                       Text(
-                        isLogin?user.name:
                         name,
                         style: TextStyle(
                             color: Colors.white,
@@ -80,7 +87,7 @@ class _DrawerScreenState extends State<DrawerScreen> {
                       SizedBox(
                         height: 2,
                       ),
-                      Text(isLogin?user.email:email,
+                      Text(email,
                           style: TextStyle(color: Colors.white))
                     ],
                   )
@@ -145,10 +152,10 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   ),
                   ListTile(
                     onTap: () {
-                      isLogin?
+
                       Navigator.of(context)
-                          .pushNamed(EditViewScreenHomePage.routeName):
-                      Navigator.of(context).pushNamed(Login.routName);
+                          .pushNamed(EditViewScreenHomePage.routeName);
+
                     },
                     leading:
                     FaIcon(FontAwesomeIcons.landmark, color: Colors.white),
@@ -159,10 +166,8 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   ),
                   ListTile(
                     onTap: () {
-                      isLogin?
                       Navigator.of(context)
-                          .pushNamed(EditAddPropertyScreen.routeName):
-                      Navigator.of(context).pushNamed(Login.routName);
+                          .pushNamed(EditAddPropertyScreen.routeName);
                     },
                     leading: Icon(Icons.add, color: Colors.white),
                     title: Text(
@@ -172,47 +177,16 @@ class _DrawerScreenState extends State<DrawerScreen> {
                   )
                 ],
               ),
-              isLogin
-                  ? GestureDetector(
-                onTap: () {
-                  setState(() {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>HomePage()));
-                  });
+             GestureDetector(
+                onTap: () async{
+                  Navigator.of(context).pop();
+                  await Provider.of<Auth>(context, listen: false).logout();
+                  Navigator.of(context).pushReplacementNamed(Login.routName);
                 },
                 child: Text(
                   "Log Out",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
-              )
-                  : Row(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushNamed(Login.routName);
-                    },
-                    child: Text("Log In",
-                        style:
-                        TextStyle(color: Colors.white, fontSize: 16)),
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  Container(
-                    height: 16,
-                    color: Colors.white,
-                    width: 2,
-                  ),
-                  SizedBox(
-                    width: 10,
-                  ),
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.of(context).pushNamed(SignUp.routeName,arguments: "signup");
-                    },
-                    child: Text("Sign Up",
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
-                  )
-                ],
               )
             ],
           ),

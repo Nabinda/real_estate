@@ -7,8 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class PropertyProvider extends ChangeNotifier {
-  String propertyId;
+   final String authToken;
+   final String userId;
   List<Property> _property = [];
+  PropertyProvider(this.authToken,this.userId,this._property);
+  String propertyId;
   List<Property> _wishList = [];
   List<Property> get properties {
     return [..._property];
@@ -40,23 +43,25 @@ class PropertyProvider extends ChangeNotifier {
     _wishList.forEach((element) {
       if (element.id == id) {
         _value = true;
+        throw HttpException("Already added to WishList");
       }
     });
     if (!_value) {
-      _wishList.add(findById(id));
-      notifyListeners();
+ _wishList.add(findById(id));
+        notifyListeners();
+
     }
   }
 
 //----------------Remove from WishList-------------
-  void removeWishList(id) {
-    _wishList.removeWhere((property) => property.id == id);
+  void removeWishList(String id) {
+  _wishList.removeWhere((property) => property.id == id);
     notifyListeners();
   }
 
 //-----------Remove Property------------------
   Future<void> removeProperty(String id) async {
-    final url = "https://bellasareas.firebaseio.com/properties/$id.json";
+    final url = "https://bellasareas.firebaseio.com/properties/$id.json?auth=$authToken";
     final existingPropertyIndex =
         properties.indexWhere((property) => property.id == id);
     var existingProperty = _property[existingPropertyIndex];
@@ -91,7 +96,7 @@ class PropertyProvider extends ChangeNotifier {
 //-----------------add Property-------------
   Future<void> addProperty(
       BuildContext context, Property property, List<File> images) async {
-    final url = "https://bellasareas.firebaseio.com/properties.json";
+    final url = "https://bellasareas.firebaseio.com/properties.json?auth=$authToken";
     List<String> fileName = [];
     List<String> imageURL = [];
     for (int i = 0; i != images.length; i++) {
@@ -118,13 +123,13 @@ class PropertyProvider extends ChangeNotifier {
             "ownerContact": property.ownerContact,
             "ownerEmail": property.ownerEmail,
             "ownerName": property.ownerName,
+            "creatorId":userId
           }));
-
       propertyId = json.decode(response.body)['name'];
       final newProperty = Property(
-          ownerName: "property.ownerName",
-          ownerEmail: "property.ownerName",
-          ownerContact: "property.ownerName",
+          ownerName: property.ownerName,
+          ownerEmail: property.ownerName,
+          ownerContact: property.ownerName,
           id: propertyId,
           images: imageURL,
           location: property.location,
@@ -162,7 +167,7 @@ class PropertyProvider extends ChangeNotifier {
     }
     try {
       if (propertyIndex >= 0) {
-        final url = "https://bellasareas.firebaseio.com/properties/$id.json";
+        final url = "https://bellasareas.firebaseio.com/properties/$id.json?auth=$authToken";
         await http.patch(url,
             body: json.encode({
               "images": imageURL,
@@ -174,9 +179,9 @@ class PropertyProvider extends ChangeNotifier {
               "roadAccess": property.roadAccess,
               "area": property.area,
               "totalRooms": property.totalRooms,
-              "ownerContact": "property.ownerContact",
-              "ownerEmail": "property.ownerEmail",
-              "ownerName": "property.ownerName",
+              "ownerContact": property.ownerContact,
+              "ownerEmail": property.ownerEmail,
+              "ownerName": property.ownerName,
             }));
         _property[propertyIndex] = property;
         notifyListeners();
@@ -204,14 +209,15 @@ class PropertyProvider extends ChangeNotifier {
 //   }
 
 //--------------Fetch Properties from firebase----------
-  Future<void> fetchAndSetProperty() async {
-    final url = "https://bellasareas.firebaseio.com/properties.json";
-    print("fetching");
+  Future<void> fetchAndSetProperty([bool filterUser = false]) async {
+    final filterString =
+    filterUser ? 'orderBy="creatorId"&equalTo="$userId"' : "";
+    final url = "https://bellasareas.firebaseio.com/properties.json?auth=$authToken&$filterString";
+    print("User Id:"+userId);
+    print(url);
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      // print("-----------Extracted Data-------");
-      // print(extractedData.toString());
       final List<Property> loadedProperty = [];
       extractedData.forEach((propertyId, propertyData) {
         loadedProperty.add(Property(

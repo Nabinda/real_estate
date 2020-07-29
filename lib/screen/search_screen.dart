@@ -184,41 +184,41 @@ class _SearchScreenState extends State<SearchScreen> {
                       ],
                     ),
                     //----------DropDown for PriceRange-----------------
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          "Price Range:",
-                          style: TextStyle(fontSize: 14, color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(
-                            left: 10,
-                          ),
-                          child: DropdownButton<String>(
-                            dropdownColor: Colors.blueGrey,
-                            items: priceRange.map((dropdownStringItem) {
-                              return DropdownMenuItem<String>(
-                                value: dropdownStringItem,
-                                child: Text(
-                                  dropdownStringItem,
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white),
-                                ),
-                              );
-                            }).toList(),
-                            value: selectedPriceRange,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedPriceRange = value;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+//                    Row(
+//                      children: <Widget>[
+//                        Text(
+//                          "Price Range:",
+//                          style: TextStyle(fontSize: 14, color: Colors.white),
+//                        ),
+//                        SizedBox(
+//                          width: 5,
+//                        ),
+//                        Container(
+//                          padding: EdgeInsets.only(
+//                            left: 10,
+//                          ),
+//                          child: DropdownButton<String>(
+//                            dropdownColor: Colors.blueGrey,
+//                            items: priceRange.map((dropdownStringItem) {
+//                              return DropdownMenuItem<String>(
+//                                value: dropdownStringItem,
+//                                child: Text(
+//                                  dropdownStringItem,
+//                                  style: TextStyle(
+//                                      fontSize: 14, color: Colors.white),
+//                                ),
+//                              );
+//                            }).toList(),
+//                            value: selectedPriceRange,
+//                            onChanged: (value) {
+//                              setState(() {
+//                                selectedPriceRange = value;
+//                              });
+//                            },
+//                          ),
+//                        ),
+//                      ],
+//                    ),
                   ],
                 ),
               ),
@@ -264,7 +264,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           ),
                         )
                       : Container(
-                          height: MediaQuery.of(context).size.height * 0.5,
+                          height: MediaQuery.of(context).size.height * 0.55,
                           child: ListView.builder(
                             itemBuilder: (ctx, index) => PropertyGridItem(
                               category: filterProperty[index].category,

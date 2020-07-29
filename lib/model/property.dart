@@ -11,9 +11,9 @@ class Property {
   final String category;
   final String area;
   final double roadAccess;
-  final int floors;
-  final int bathrooms;
-  final int totalRooms;
+  final String floors;
+  final String bathrooms;
+  final String totalRooms;
 
   Property({
     @required this.id,

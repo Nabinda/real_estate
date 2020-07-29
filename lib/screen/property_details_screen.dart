@@ -357,62 +357,66 @@ class PropertyDetailsScreen extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       SizedBox(
-                                        width: 15.0,
+                                        width: 10.0,
                                       ),
                                       Text(
                                         "Name :",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       SizedBox(
-                                        width: 10.0,
+                                        width: 5.0,
                                       ),
-                                      Text(
-                                        "property.ownerName",
-                                        style: TextStyle(fontSize: 18),
+                                      Expanded(
+                                        child: Text(
+                                          property.ownerName,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                       )
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 7.0,
+                                    height: 10,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       SizedBox(
-                                        width: 15.0,
+                                        width: 10.0,
                                       ),
                                       Text(
                                         "Email :",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       SizedBox(
-                                        width: 10.0,
+                                        width: 5.0,
                                       ),
-                                      Text(
-                                        "property.ownerEmail",
-                                        style: TextStyle(fontSize: 18),
+                                      Expanded(
+                                        child: Text(
+                                          property.ownerEmail,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
                                       )
                                     ],
                                   ),
                                   SizedBox(
-                                    height: 7.0,
+                                    height: 10,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: <Widget>[
                                       SizedBox(
-                                        width: 15.0,
+                                        width: 10.0,
                                       ),
                                       Text(
                                         "Contact :",
                                         style: TextStyle(fontSize: 18),
                                       ),
                                       SizedBox(
-                                        width: 10.0,
+                                        width: 5.0,
                                       ),
                                       Text(
-                                        "property.ownerContact",
-                                        style: TextStyle(fontSize: 18),
+                                        property.ownerContact,
+                                        style: TextStyle(fontSize: 16),
                                       )
                                     ],
                                   ),

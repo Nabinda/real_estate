@@ -4,7 +4,6 @@ import 'package:bellasareas/screen/login.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class SignUp extends StatefulWidget {
@@ -48,9 +47,11 @@ Future<void> signUp() async{
     try{
       await Provider.of<Auth>(context, listen: false)
             .signUp(_email, _password,_contact,_name);
+      Navigator.pop(context);
 
     
     }on HttpException catch (error) {
+      print(error.toString());
       var errorMessage = "Authentication Failed";
       if (error.toString().contains("EMAIL_EXITS")) {
         errorMessage = 'This email address is already in use.';
@@ -97,7 +98,7 @@ Future<void> signUp() async{
             IconButton(
                 icon: Icon(Icons.arrow_back_ios, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pushNamed(OverViewScreen.routeName);
+                  Navigator.of(context).pushNamed(Login.routName);
                 }),
             SizedBox(height: 50.0),
             Padding(
@@ -452,72 +453,72 @@ Future<void> signUp() async{
 
                         //-------------------------Login with social Media-----------------------------
 
-                        Text(
-                          'Continue with Social media',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 17,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 30,
-                        ),
-
-                        Row(
-                          children: <Widget>[
-                            Expanded(
-                              child: Container(
-                                alignment: Alignment.center,
-                                //   margin: EdgeInsets.all(30),
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.white70,
-                                      offset: Offset(0, 10),
-                                      blurRadius: 10.0,
-                                    ),
-                                  ],
-                                  color: Colors.blue[900],
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Icon(
-                                  FontAwesomeIcons.facebookF,
-                                  color: Colors.white,
-                                  size: 40,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 20.0,
-                            ),
-                            Expanded(
-                              child: Container(
-                                alignment: Alignment.center,
-                                //  margin: EdgeInsets.all(30),
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.white70,
-                                      offset: Offset(0, 10),
-                                      blurRadius: 10.0,
-                                    ),
-                                  ],
-                                  color: Color(0xFF17a3f2),
-                                  borderRadius: BorderRadius.circular(50),
-                                ),
-                                child: Icon(
-                                  FontAwesomeIcons.twitter,
-                                  color: Colors.white,
-                                  size: 40,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+//                        Text(
+//                          'Continue with Social media',
+//                          style: TextStyle(
+//                            color: Colors.grey,
+//                            fontWeight: FontWeight.bold,
+//                            fontStyle: FontStyle.italic,
+//                            fontSize: 17,
+//                          ),
+//                        ),
+//                        SizedBox(
+//                          height: 30,
+//                        ),
+//
+//                        Row(
+//                          children: <Widget>[
+//                            Expanded(
+//                              child: Container(
+//                                alignment: Alignment.center,
+//                                //   margin: EdgeInsets.all(30),
+//                                height: 50,
+//                                decoration: BoxDecoration(
+//                                  boxShadow: [
+//                                    BoxShadow(
+//                                      color: Colors.white70,
+//                                      offset: Offset(0, 10),
+//                                      blurRadius: 10.0,
+//                                    ),
+//                                  ],
+//                                  color: Colors.blue[900],
+//                                  borderRadius: BorderRadius.circular(50),
+//                                ),
+//                                child: Icon(
+//                                  FontAwesomeIcons.facebookF,
+//                                  color: Colors.white,
+//                                  size: 40,
+//                                ),
+//                              ),
+//                            ),
+//                            SizedBox(
+//                              width: 20.0,
+//                            ),
+//                            Expanded(
+//                              child: Container(
+//                                alignment: Alignment.center,
+//                                //  margin: EdgeInsets.all(30),
+//                                height: 50,
+//                                decoration: BoxDecoration(
+//                                  boxShadow: [
+//                                    BoxShadow(
+//                                      color: Colors.white70,
+//                                      offset: Offset(0, 10),
+//                                      blurRadius: 10.0,
+//                                    ),
+//                                  ],
+//                                  color: Color(0xFF17a3f2),
+//                                  borderRadius: BorderRadius.circular(50),
+//                                ),
+//                                child: Icon(
+//                                  FontAwesomeIcons.twitter,
+//                                  color: Colors.white,
+//                                  size: 40,
+//                                ),
+//                              ),
+//                            ),
+//                          ],
+//                        ),
                       ],
                     ),
                   ),

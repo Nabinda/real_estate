@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:bellasareas/exception/http_exception.dart';
+import 'package:bellasareas/model/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,10 +11,17 @@ class Auth with ChangeNotifier {
   DateTime _expiryDate;
   String _userId;
   Timer _authTimer;
+  bool isLogin = false;
+  bool get checkIsLogin{
+    return isLogin;
+  }
+  void toggleLogin(){
+    isLogin = !isLogin;
+    notifyListeners();
+  }
   bool get isAuth {
     return _token != null;
   }
-
   String get token {
     if (_expiryDate != null &&
         _token != null &&
@@ -30,7 +38,7 @@ class Auth with ChangeNotifier {
   Future<void> _authenticate(
       String email, String password, String urlSegment,String name, String contact) async {
     final url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyC8Ys8JBRdA-sGTpySUSt0XUR-0uYESLkA";
+        "https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyBr-oWsNemMZaDow47xK9WtVCQ4g8rHYUQ";
     try {
       final response = await http.post(url,
           body: json.encode({
@@ -51,19 +59,22 @@ class Auth with ChangeNotifier {
       if (urlSegment == "signUp") {
         final user = await addUserInfo(_token, _userId, email,name,contact);
       } else {
-        final user = await fetchUserInfo(_token, _userId);
+       final user = await fetchUserInfo(_token, _userId);
+       final prefs = await SharedPreferences.getInstance();
+          print("Fetched User Info");
+          print(user["name"]);
+       final userData = json.encode({
+         'token': _token,
+         'userId': _userId,
+         'expiryDate': _expiryDate.toIso8601String(),
+         'email': email,
+         'name': user["name"],
+         'contact':user["contact"]
+       });
+       prefs.setString("userData", userData);
+       _autoLogout();
+       notifyListeners();
       }
-      _autoLogout();
-      notifyListeners();
-      //initialize shared preferences
-      final prefs = await SharedPreferences.getInstance();
-      final userData = json.encode({
-        'token': _token,
-        'userId': _userId,
-        'expiryDate': _expiryDate.toIso8601String(),
-        'email': email
-      });
-      prefs.setString("userData", userData);
     } catch (error) {
       throw (error);
     }
@@ -74,10 +85,12 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> logIn(String email, String password) async {
+
     return _authenticate(email, password, "signInWithPassword","","");
   }
 
   Future<void> logout() async {
+    toggleLogin();
     _token = null;
     _expiryDate = null;
     _userId = null;
@@ -134,14 +147,25 @@ class Auth with ChangeNotifier {
     }
   }
 
-  Future<void> fetchUserInfo(String authToken, String userId) async {
+  Future<Map> fetchUserInfo(String authToken, String userId) async {
     final url =
         "https://bellasareas.firebaseio.com/users/$userId.json?auth=$authToken";
     try {
       final response = await http.get(url);
+      User extractedUser;
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-      print(extractedData.toString());
-    } catch (error) {
+//      extractedData.forEach((key, value) {
+//        extractedUser = User(
+//          id: key,
+//          name: value["name"],
+//          contact: value["contact"],
+//          email: value["email"],
+//        );
+//      });
+//      print("Extracted User:");
+//      print(extractedUser.name);
+      return extractedData;
+      } catch (error) {
       throw (error);
     }
   }

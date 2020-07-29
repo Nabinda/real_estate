@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:bellasareas/model/property.dart';
 import 'package:bellasareas/provider/category_provider.dart';
@@ -10,6 +11,7 @@ import 'package:bellasareas/widgets/category_dropdown.dart';
 import 'package:bellasareas/widgets/district_dropdown.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class EditAddPropertyScreen extends StatefulWidget {
   static const routeName = "/edit_add_property_screen";
@@ -38,6 +40,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (isInit) {
+      getUserData();
       final id = ModalRoute.of(context).settings.arguments;
       if (id != null) {
         _editedProperty =
@@ -62,9 +65,25 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     }
     isInit = false;
   }
+  void getUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final extractedData =
+    json.decode(prefs.getString("userData")) as Map<String, Object>;
+    setState(() {
+      email = extractedData['email'];
+      name = extractedData['name'];
+      contact = extractedData['contact'];
+    });
+    print("Property Owner Information");
+    print(email);
+    print(name);
+    print(contact);
+  }
 
   bool isInit = true;
-
+  String email;
+  String name;
+  String contact;
   bool isImage = false;
   List<File> images = List<File>();
   final _form = GlobalKey<FormState>();
@@ -115,9 +134,9 @@ class _EditAddPropertyState extends State<EditAddProperty> {
       price: 0,
       location: "",
       images: [],
-      totalRooms: 0,
-      floors: 0,
-      bathrooms: 0);
+      totalRooms: "",
+      floors: "",
+      bathrooms: "");
 
 //-----------------to get image from mobile storage----------
   Future getImage(bool isCamera) async {
@@ -215,6 +234,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     });
     if (_editedProperty.id != null) {
       try {
+
         await Provider.of<PropertyProvider>(context, listen: false)
             .updateProperty(_editedProperty.id, _editedProperty, images);
       } catch (error) {
@@ -553,10 +573,6 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                         id: _editedProperty.id,
                                         roadAccess: _editedProperty.roadAccess,
                                         area: userInput,
-                                        ownerName: _editedProperty.ownerName,
-                                        ownerEmail: _editedProperty.ownerEmail,
-                                        ownerContact:
-                                            _editedProperty.ownerContact,
                                         category: category,
                                         price: _editedProperty.price,
                                         location: selectedLocation,
@@ -630,7 +646,11 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                         price: _editedProperty.price,
                                         category: _editedProperty.category,
                                         roadAccess: double.parse(value),
-                                        id: _editedProperty.id);
+                                        id: _editedProperty.id,
+                                        ownerName: name,
+                                        ownerEmail: email,
+                                        ownerContact: contact,
+                                    );
                                   },
                                   cursorColor: Colors.white,
                                   keyboardType: TextInputType.number,
@@ -669,7 +689,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                                   roadAccess: _editedProperty
                                                       .roadAccess,
                                                   id: _editedProperty.id,
-                                                  floors: int.parse(value));
+                                                  floors: value);
                                             },
                                             validator: (value) {
                                               if (value.isEmpty) {
@@ -713,12 +733,13 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                                   location:
                                                       _editedProperty.location,
                                                   price: _editedProperty.price,
+                                                  floors: _editedProperty.floors,
                                                   category:
                                                       _editedProperty.category,
                                                   roadAccess: _editedProperty
                                                       .roadAccess,
                                                   id: _editedProperty.id,
-                                                  bathrooms: int.parse(value));
+                                                  bathrooms: value);
                                             },
                                             validator: (value) {
                                               if (value.isEmpty) {
@@ -767,8 +788,14 @@ class _EditAddPropertyState extends State<EditAddProperty> {
                                                       _editedProperty.category,
                                                   roadAccess: _editedProperty
                                                       .roadAccess,
+                                                  floors: _editedProperty.floors,
+                                                  bathrooms: _editedProperty.bathrooms,
                                                   id: _editedProperty.id,
-                                                  totalRooms: int.parse(value));
+                                                  ownerName: name,
+                                                  ownerEmail: email,
+                                                  ownerContact:
+                                                  contact,
+                                                  totalRooms: value);
                                             },
                                             validator: (value) {
                                               if (value.isEmpty) {

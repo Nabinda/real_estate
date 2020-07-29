@@ -197,7 +197,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                   alignment: Alignment.center,
                   child: Text(
                     "All the Properties are Sold!!!",
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white,fontSize: 20),
                   ),
                 )
               : Container(
