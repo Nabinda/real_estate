@@ -61,8 +61,6 @@ class Auth with ChangeNotifier {
       } else {
        final user = await fetchUserInfo(_token, _userId);
        final prefs = await SharedPreferences.getInstance();
-          print("Fetched User Info");
-          print(user["name"]);
        final userData = json.encode({
          'token': _token,
          'userId': _userId,
@@ -98,7 +96,6 @@ class Auth with ChangeNotifier {
       _authTimer.cancel();
       _authTimer = null;
     }
-
 //clearing shared preferences
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
@@ -154,16 +151,6 @@ class Auth with ChangeNotifier {
       final response = await http.get(url);
       User extractedUser;
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
-//      extractedData.forEach((key, value) {
-//        extractedUser = User(
-//          id: key,
-//          name: value["name"],
-//          contact: value["contact"],
-//          email: value["email"],
-//        );
-//      });
-//      print("Extracted User:");
-//      print(extractedUser.name);
       return extractedData;
       } catch (error) {
       throw (error);

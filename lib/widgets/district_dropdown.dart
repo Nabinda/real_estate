@@ -1,6 +1,7 @@
 import 'package:bellasareas/provider/district_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 
 class DistrictDropDown extends StatelessWidget {
   @override
@@ -11,13 +12,13 @@ class DistrictDropDown extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 2),
       child: DropdownButton<String>(
-        dropdownColor: Colors.blueGrey,
+        dropdownColor: style.CustomTheme.circularColor1,
         items: district.map((dropdownStringItem) {
           return DropdownMenuItem<String>(
             value: dropdownStringItem,
             child: Text(
               dropdownStringItem,
-              style: TextStyle(fontSize: 14, color: Colors.white),
+              style: style.CustomTheme.kTextStyle,
             ),
           );
         }).toList(),

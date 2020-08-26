@@ -74,10 +74,6 @@ class _EditAddPropertyState extends State<EditAddProperty> {
       name = extractedData['name'];
       contact = extractedData['contact'];
     });
-    print("Property Owner Information");
-    print(email);
-    print(name);
-    print(contact);
   }
 
   bool isInit = true;
@@ -279,7 +275,7 @@ class _EditAddPropertyState extends State<EditAddProperty> {
     setState(() {
       isLoading = false;
     });
-    Navigator.of(context).pushNamed(OverViewScreen.routeName);
+
   }
 
   @override

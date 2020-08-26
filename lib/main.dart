@@ -7,7 +7,7 @@ import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
 import 'package:bellasareas/screen/login.dart';
-import 'package:bellasareas/screen/login_signup.dart';
+import 'package:bellasareas/screen/signup.dart';
 import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/property_details_screen.dart';
 import 'package:bellasareas/screen/search_screen.dart';

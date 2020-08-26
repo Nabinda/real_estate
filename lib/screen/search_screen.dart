@@ -9,6 +9,7 @@ import 'package:bellasareas/widgets/property_grid_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 import 'package:provider/provider.dart';
 
 //------------------For App Drawer-------------------
@@ -96,7 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.blueGrey,
+        gradient: style.CustomTheme.homeGradient,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: Column(
@@ -106,13 +107,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey[800],
-                    offset: Offset(0, 5),
-                    blurRadius: 10.0,
-                  ),
-                ],
+                boxShadow: style.CustomTheme.textFieldBoxShadow,
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(
@@ -139,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       ),
                 Text(
                   "Bellas Areas",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: style.CustomTheme.headerBlack,
                 ),
                 Container()
               ],
@@ -149,7 +144,7 @@ class _SearchScreenState extends State<SearchScreen> {
           Column(
             children: <Widget>[
               SizedBox(
-                height: 40,
+                height: 10,
               ),
               //-----------Search Filters--------------
               Container(
@@ -162,7 +157,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: <Widget>[
                         Text(
                           "Category:",
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                          style: style.CustomTheme.kTextStyle,
                         ),
                         SizedBox(
                           width: 5,
@@ -175,7 +170,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       children: <Widget>[
                         Text(
                           "Location:",
-                          style: TextStyle(fontSize: 14, color: Colors.white),
+                          style: style.CustomTheme.kTextStyle,
                         ),
                         SizedBox(
                           width: 5,
@@ -183,61 +178,12 @@ class _SearchScreenState extends State<SearchScreen> {
                         DistrictDropDown(),
                       ],
                     ),
-                    //----------DropDown for PriceRange-----------------
-//                    Row(
-//                      children: <Widget>[
-//                        Text(
-//                          "Price Range:",
-//                          style: TextStyle(fontSize: 14, color: Colors.white),
-//                        ),
-//                        SizedBox(
-//                          width: 5,
-//                        ),
-//                        Container(
-//                          padding: EdgeInsets.only(
-//                            left: 10,
-//                          ),
-//                          child: DropdownButton<String>(
-//                            dropdownColor: Colors.blueGrey,
-//                            items: priceRange.map((dropdownStringItem) {
-//                              return DropdownMenuItem<String>(
-//                                value: dropdownStringItem,
-//                                child: Text(
-//                                  dropdownStringItem,
-//                                  style: TextStyle(
-//                                      fontSize: 14, color: Colors.white),
-//                                ),
-//                              );
-//                            }).toList(),
-//                            value: selectedPriceRange,
-//                            onChanged: (value) {
-//                              setState(() {
-//                                selectedPriceRange = value;
-//                              });
-//                            },
-//                          ),
-//                        ),
-//                      ],
-//                    ),
                   ],
                 ),
               ),
               //-------------Search Button------------------
               Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey,
-                        offset: Offset(0, 1),
-                        blurRadius: 2),
-                  ],
-                  gradient: LinearGradient(colors: [
-                    Colors.purple[900],
-                    Colors.purple[600],
-                    Colors.purple[300],
-                  ]),
-                  borderRadius: BorderRadius.circular(15),
-                ),
+                decoration: style.CustomTheme.buttonDecoration,
                 width: 130,
                 child: ListTile(
                   onTap: () {
@@ -253,16 +199,18 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                 ),
               ),
-              Divider(),
               //----------Search Results here-------------------
               isSearch
                   ? filterProperty.isEmpty
-                      ? Center(
-                          child: Text(
-                            "NO RESULT FOUND!!!",
-                            style: TextStyle(color: Colors.white),
+                      ? Container(
+                height: MediaQuery.of(context).size.height * 0.55,
+                        child: Center(
+                            child: Text(
+                              "NO RESULT FOUND!!!",
+                              style: style.CustomTheme.header,
+                            ),
                           ),
-                        )
+                      )
                       : Container(
                           height: MediaQuery.of(context).size.height * 0.55,
                           child: ListView.builder(

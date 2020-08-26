@@ -6,6 +6,7 @@ import 'package:bellasareas/widgets/property_grid_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 
 enum SortOption { Highest, Lowest }
 
@@ -78,7 +79,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.blueGrey,
+        gradient: style.CustomTheme.homeGradient,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: Column(
@@ -88,13 +89,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey[800],
-                    offset: Offset(0, 5),
-                    blurRadius: 10.0,
-                  ),
-                ],
+                boxShadow: style.CustomTheme.textFieldBoxShadow,
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(
@@ -120,8 +115,8 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                         },
                       ),
                 Text(
-                  "Bellas Areas",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  category,
+                  style: style.CustomTheme.headerBlack,
                 ),
                 IconButton(
                   icon: Icon(
@@ -141,26 +136,22 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
           //-------------Sorting Part-----------
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
-                  padding: EdgeInsets.only(left: 15.0),
+                  padding: EdgeInsets.only(left: 15.0,top: 10),
                   child: Text(
                     "Available Properties",
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        decoration: TextDecoration.underline,
-                        decorationColor: Colors.purple),
+                    style: style.CustomTheme.header,
                   )),
               PopupMenuButton(
                 itemBuilder: (_) => [
                   PopupMenuItem<SortOption>(
-                    child: Text("By Highest"),
+                    child: Text("By Highest",style: style.CustomTheme.secondFont,),
                     value: SortOption.Highest,
                   ),
                   PopupMenuItem<SortOption>(
-                    child: Text("By Lowest"),
+                    child: Text("By Lowest",style: style.CustomTheme.secondFont,),
                     value: SortOption.Lowest,
                   ),
                 ],
@@ -181,9 +172,7 @@ class _LandBuildingScreenState extends State<LandBuildingScreen> {
                     ),
                     Text(
                       "Sort By",
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
+                      style: style.CustomTheme.kTextStyle,
                     ),
                   ],
                 ),

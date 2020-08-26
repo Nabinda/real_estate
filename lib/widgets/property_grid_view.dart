@@ -6,8 +6,7 @@ import 'package:provider/provider.dart';
 class PropertyGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final property = Provider.of<PropertyProvider>(context).properties;
-    //property.shuffle();
+    final property = Provider.of<PropertyProvider>(context,listen: false).properties;
     return ListView.builder(
       itemBuilder: (ctx, index) => PropertyGridItem(
         id: property[index].id,

@@ -1,6 +1,7 @@
 import 'package:bellasareas/provider/category_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 
 class CategoryDropDown extends StatelessWidget {
   @override
@@ -10,13 +11,13 @@ class CategoryDropDown extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.only(left: 5),
       child: DropdownButton<String>(
-        dropdownColor: Colors.blueGrey,
+        dropdownColor: style.CustomTheme.circularColor1,
         items: categories.map((dropdownStringItem) {
           return DropdownMenuItem<String>(
             value: dropdownStringItem,
             child: Text(
               dropdownStringItem,
-              style: TextStyle(fontSize: 14, color: Colors.white),
+              style: style.CustomTheme.kTextStyle,
             ),
           );
         }).toList(),

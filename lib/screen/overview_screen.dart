@@ -4,6 +4,7 @@ import 'package:bellasareas/widgets/property_grid_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 
 class OverViewScreen extends StatefulWidget {
   static const routeName = "/overViewScreen";
@@ -16,27 +17,6 @@ class _OverViewScreenState extends State<OverViewScreen> {
   double yOffSet = 0;
   double scaleFactor = 1;
   bool isDrawerOpen = false;
-  bool _isInit = true; // true
-  bool _isLoading = false;
-  @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<PropertyProvider>(context, listen: false)
-          .fetchAndSetProperty()
-          .then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-      });
-    }
-    _isInit = true;
-
-    super.didChangeDependencies();
-  }
-
   void openDrawer() {
     setState(() {
       xOffSet = 200;
@@ -45,7 +25,6 @@ class _OverViewScreenState extends State<OverViewScreen> {
       isDrawerOpen = true;
     });
   }
-
   void closeDrawer() {
     setState(() {
       xOffSet = 0;
@@ -54,7 +33,6 @@ class _OverViewScreenState extends State<OverViewScreen> {
       isDrawerOpen = false;
     });
   }
-
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
@@ -63,7 +41,7 @@ class _OverViewScreenState extends State<OverViewScreen> {
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.blueGrey,
+        gradient: style.CustomTheme.homeGradient,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: Column(
@@ -73,13 +51,7 @@ class _OverViewScreenState extends State<OverViewScreen> {
           Container(
             margin: EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey[800],
-                    offset: Offset(0, 5),
-                    blurRadius: 10.0,
-                  ),
-                ],
+                boxShadow: style.CustomTheme.textFieldBoxShadow,
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: Row(
@@ -106,7 +78,7 @@ class _OverViewScreenState extends State<OverViewScreen> {
                       ),
                 Text(
                   "Bellas Areas",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: style.CustomTheme.headerBlack,
                 ),
                 IconButton(
                   icon: Icon(
@@ -126,12 +98,22 @@ class _OverViewScreenState extends State<OverViewScreen> {
           //Body Part
           Container(
               height: MediaQuery.of(context).size.height * 0.85,
-              child: _isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(
-                      backgroundColor: Colors.red,
-                    ))
-                  : PropertyGridView()),
+              child: FutureBuilder(
+                future: Provider.of<PropertyProvider>(context, listen: false)
+                    .fetchAndSetProperty(),
+                builder: (ctx,snapshot){
+                  if(snapshot.connectionState==ConnectionState.waiting){
+                    return Center(
+                        child: CircularProgressIndicator(
+                          backgroundColor: style.CustomTheme.circularColor1,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.4)),
+                        ));
+                  }
+                  else {
+                    return PropertyGridView();
+                  }
+                },
+              )),
         ],
       ),
     );

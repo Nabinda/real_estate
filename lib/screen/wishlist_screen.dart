@@ -2,6 +2,7 @@ import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/widgets/property_tile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 
 class WishList extends StatelessWidget {
   static const routeName = "/wishList_screen";
@@ -10,23 +11,19 @@ class WishList extends StatelessWidget {
     final property =
         Provider.of<PropertyProvider>(context, listen: false).wishList;
     return Scaffold(
-      backgroundColor: Colors.blueGrey,
-      body: SafeArea(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: style.CustomTheme.homeGradient
+        ),
+        height: MediaQuery.of(context).size.height,
+        child: SafeArea(
           child: Column(
             children: <Widget>[
               //----------------------Custom App Bar-----------------
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                 decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey[800],
-                        offset: Offset(0, 5),
-                        blurRadius: 10.0,
-                      ),
-                    ],
+                    boxShadow: style.CustomTheme.textFieldBoxShadow,
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(10.0))),
                 child: Row(
@@ -44,7 +41,7 @@ class WishList extends StatelessWidget {
                     Text(
                       "WishList",
                       style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                         style.CustomTheme.headerBlack,
                     ),
                     Container(
                       width: 50,
@@ -58,7 +55,7 @@ class WishList extends StatelessWidget {
                       child: Center(
                         child: Text(
                           "Your WishList is Empty!!!!",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: style.CustomTheme.header,
                         ),
                       ),
                     )

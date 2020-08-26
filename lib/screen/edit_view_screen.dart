@@ -1,8 +1,8 @@
-import 'package:bellasareas/model/property.dart';
+
+import 'package:bellasareas/utils/custom_theme.dart' as style;
 import 'package:bellasareas/provider/property_provider.dart';
 import 'package:bellasareas/screen/drawer_screen.dart';
 import 'package:bellasareas/screen/add_property_screen.dart';
-import 'package:bellasareas/screen/wishlist_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -65,7 +65,7 @@ class _EditViewScreenState extends State<EditViewScreen> {
         ..scale(scaleFactor),
       duration: Duration(milliseconds: 500),
       decoration: BoxDecoration(
-        color: Colors.blueGrey,
+        gradient: style.CustomTheme.homeGradient,
         borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
       ),
       child: Column(children: <Widget>[
@@ -74,12 +74,7 @@ class _EditViewScreenState extends State<EditViewScreen> {
         Container(
           margin: EdgeInsets.symmetric(horizontal: 10),
           decoration: BoxDecoration(
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey[800],
-                    offset: Offset(0, 5),
-                    blurRadius: 10.0),
-              ],
+              boxShadow: style.CustomTheme.textFieldBoxShadow,
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10.0))),
           child: Row(
@@ -106,7 +101,7 @@ class _EditViewScreenState extends State<EditViewScreen> {
                     ),
               Text(
                 "Your Property",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: style.CustomTheme.headerBlack,
               ),
               IconButton(
                 icon: Icon(
@@ -141,7 +136,7 @@ class _EditViewScreenState extends State<EditViewScreen> {
                       height: MediaQuery.of(context).size.height * 0.8,
                       child:
                       property.properties.isEmpty?
-                          Center(child: Text("Add Your Properties First !!!",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold,fontSize: 20 ),))
+                          Center(child: Text("Add Your Properties First !!!",style:style.CustomTheme.header,))
                           :
                       ListView.builder(
                           itemBuilder: (ctx, index) {
@@ -174,9 +169,31 @@ class _EditViewScreenState extends State<EditViewScreen> {
                                           color: Colors.purple,
                                         ),
                                         onPressed: () {
-                                          Navigator.of(context).pushNamed(
-                                              EditAddPropertyScreen.routeName,
-                                              arguments: property.properties[index].id);
+                                          showDialog(
+                                            context: context,
+                                            builder: (ctx) => AlertDialog(
+                                              title: Text("Are you sure?"),
+                                              content: Text(
+                                                  "Do you want to edit this property?"),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text("NO"),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                FlatButton(
+                                                  child: Text("YES"),
+                                                  onPressed: () {
+                                                    Navigator.of(context).pushNamed(
+                                                        EditAddPropertyScreen.routeName,
+                                                        arguments: property.properties[index].id);
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          );
+
                                         },
                                       ),
                                       IconButton(
@@ -186,9 +203,31 @@ class _EditViewScreenState extends State<EditViewScreen> {
                                           color: Colors.purple,
                                         ),
                                         onPressed: () {
-                                          Provider.of<PropertyProvider>(context,
-                                              listen: false)
-                                              .removeProperty(property.properties[index].id);
+                                          showDialog(
+                                            context: context,
+                                            builder: (ctx) => AlertDialog(
+                                              title: Text("Are you sure?"),
+                                              content: Text(
+                                                  "Do you want to delete this property?"),
+                                              actions: <Widget>[
+                                                FlatButton(
+                                                  child: Text("NO"),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                ),
+                                                FlatButton(
+                                                  child: Text("YES"),
+                                                  onPressed: () {
+                                                    Provider.of<PropertyProvider>(context,
+                                                        listen: false)
+                                                        .removeProperty(property.properties[index].id);
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          );
+
                                         },
                                       ),
                                     ],
