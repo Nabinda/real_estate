@@ -13,6 +13,7 @@ class DistrictDropDown extends StatelessWidget {
       padding: EdgeInsets.only(left: 2),
       child: DropdownButton<String>(
         dropdownColor: style.CustomTheme.circularColor1,
+        iconEnabledColor: style.CustomTheme.iconColor,
         items: district.map((dropdownStringItem) {
           return DropdownMenuItem<String>(
             value: dropdownStringItem,

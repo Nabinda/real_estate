@@ -2,7 +2,6 @@ import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/provider/category_provider.dart';
 import 'package:bellasareas/provider/district_provider.dart';
 import 'package:bellasareas/provider/property_provider.dart';
-import 'package:bellasareas/screen/drawer_screen.dart';
 import 'package:bellasareas/screen/add_property_screen.dart';
 import 'package:bellasareas/screen/edit_view_screen.dart';
 import 'package:bellasareas/screen/lands_building_screen.dart';
@@ -26,12 +25,10 @@ class SplashClass extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => Auth(),
+          create: (_) => AuthProvider(),
         ),
-        ChangeNotifierProxyProvider<Auth, PropertyProvider>(update: (BuildContext context, Auth auth, PropertyProvider previousProperty) {
-          return PropertyProvider(auth.token,auth.userId,previousProperty==null?[]:previousProperty.properties);
-        },
-
+        ChangeNotifierProvider(
+        create: (_) => PropertyProvider(),
         ),
         ChangeNotifierProvider(
           create: (_) => CategoryProvider(),
@@ -41,19 +38,19 @@ class SplashClass extends StatelessWidget {
         ),
 
       ],
-      child: Consumer<Auth>(
+      child: Consumer<AuthProvider>(
         builder: (ctx,auth,_){
           return MaterialApp(
             debugShowCheckedModeBanner: false,
             home: SplashBetween(),
             routes: {
-              OverViewScreen.routeName: (ctx) => HomePage(),
+              OverViewScreen.routeName: (ctx) => OverViewScreen(),
               SearchScreen.routeName: (ctx) => SearchScreenHomePage(),
-              LandBuildingScreenHomePage.routeName: (ctx) =>
-                  LandBuildingScreenHomePage(),
+              LandBuildingScreen.routeName: (ctx) =>
+                  LandBuildingScreen(),
               PropertyDetailsScreen.routeName: (ctx) => PropertyDetailsScreen(),
               EditAddPropertyScreen.routeName: (ctx) => EditAddPropertyScreen(),
-              EditViewScreenHomePage.routeName: (ctx) => EditViewScreenHomePage(),
+              EditViewScreen.routeName: (ctx) => EditViewScreen(),
               WishList.routeName: (ctx) => WishList(),
               SignUp.routeName: (ctx) => SignUp(),
               Login.routName:(ctx) => Login(),
@@ -119,14 +116,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void checkLogin() async {
-    isLogin = await Provider.of<Auth>(context).tryAutoLogin();
+    isLogin = await Provider.of<AuthProvider>(context).tryAutoLogin();
   }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: isLogin?Stack(
-        children: <Widget>[DrawerScreen(), OverViewScreen()],
-      ):Login(),
+      body: isLogin?OverViewScreen():Login(),
     );
   }
 }

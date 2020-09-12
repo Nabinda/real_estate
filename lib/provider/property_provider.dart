@@ -1,25 +1,27 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:bellasareas/model/property.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class PropertyProvider extends ChangeNotifier {
-   final String authToken;
-   final String userId;
   List<Property> _property = [];
-  PropertyProvider(this.authToken,this.userId,this._property);
   String propertyId;
   List<Property> _wishList = [];
   List<Property> get properties {
     return [..._property];
   }
+   List<Property> get recentProperties {
+     return [..._property.reversed];
+   }
 
   List<Property> get wishList {
     return [..._wishList];
   }
+
 
   Property findById(String id) {
     return _property.firstWhere((property) => property.id == id);
@@ -61,7 +63,7 @@ class PropertyProvider extends ChangeNotifier {
 
 //-----------Remove Property------------------
   Future<void> removeProperty(String id) async {
-    final url = "https://bellasareas.firebaseio.com/properties/$id.json?auth=$authToken";
+    final url = "https://bellasareas.firebaseio.com/properties/$id.json";
     final existingPropertyIndex =
         properties.indexWhere((property) => property.id == id);
     var existingProperty = _property[existingPropertyIndex];
@@ -94,16 +96,15 @@ class PropertyProvider extends ChangeNotifier {
   //--------------END OF SORTING FUNCTION-----------------
 
 //-----------------add Property-------------
-  Future<void> addProperty(
-      BuildContext context, Property property, List<File> images) async {
-    final url = "https://bellasareas.firebaseio.com/properties.json?auth=$authToken";
+  Future<void> addProperty(BuildContext context, Property property, List<PickedFile> images) async {
+    final url = "https://bellasareas.firebaseio.com/properties.json";
     List<String> fileName = [];
     List<String> imageURL = [];
     for (int i = 0; i != images.length; i++) {
       fileName.add('property/${basename(images[i].path)}');
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(fileName[i]);
-      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(File(images[i].path));
       var downloadURL =
           await (await uploadTask.onComplete).ref.getDownloadURL();
       imageURL.add(downloadURL.toString());
@@ -123,7 +124,6 @@ class PropertyProvider extends ChangeNotifier {
             "ownerContact": property.ownerContact,
             "ownerEmail": property.ownerEmail,
             "ownerName": property.ownerName,
-            "creatorId":userId
           }));
       propertyId = json.decode(response.body)['name'];
       final newProperty = Property(
@@ -149,8 +149,7 @@ class PropertyProvider extends ChangeNotifier {
 
 
 //---------------------update Property------------
-  Future<void> updateProperty(
-      String id, Property property, List<File> images) async {
+  Future<void> updateProperty(String id, Property property, List<PickedFile> images) async {
     final propertyIndex = _property.indexWhere((property) => property.id == id);
     List<String> fileName = [];
     List<String> imageURL = [];
@@ -158,7 +157,7 @@ class PropertyProvider extends ChangeNotifier {
       fileName.add('property/${basename(images[i].path)}');
       StorageReference firebaseStorageRef =
           FirebaseStorage.instance.ref().child(fileName[i]);
-      StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
+      StorageUploadTask uploadTask = firebaseStorageRef.putFile(File(images[i].path));
       var downloadURL =
           await (await uploadTask.onComplete).ref.getDownloadURL();
       print("------------------Updated Image URL----------------------");
@@ -167,7 +166,7 @@ class PropertyProvider extends ChangeNotifier {
     }
     try {
       if (propertyIndex >= 0) {
-        final url = "https://bellasareas.firebaseio.com/properties/$id.json?auth=$authToken";
+        final url = "https://bellasareas.firebaseio.com/properties/$id.json";
         await http.patch(url,
             body: json.encode({
               "images": imageURL,
@@ -190,31 +189,10 @@ class PropertyProvider extends ChangeNotifier {
       throw error;
     }
   }
-
-//---------------Upload photo to firebase Storage----------------------
-//   Future uploadPhoto(BuildContext context, List<File> images) async {
-//     List<String> fileName = [];
-// //    final StorageReference firebaseStorageRef =
-// //        FirebaseStorage.instance.ref().child('myImages.jpg');
-// //    final StorageUploadTask task = firebaseStorageRef.putFile(images[0]);
-
-//     for (int i = 0; i != images.length; i++) {
-//       fileName.add('property/$propertyId/${basename(images[i].path)}');
-//       print(fileName[i]);
-//       StorageReference firebaseStorageRef =
-//           FirebaseStorage.instance.ref().child(fileName[i]);
-//       StorageUploadTask uploadTask = firebaseStorageRef.putFile(images[i]);
-//       await uploadTask.onComplete;
-//     }
-//   }
-
 //--------------Fetch Properties from firebase----------
   Future<void> fetchAndSetProperty([bool filterUser = false]) async {
-    final filterString =
-    filterUser ? 'orderBy="creatorId"&equalTo="$userId"' : "";
-    final url = "https://bellasareas.firebaseio.com/properties.json?auth=$authToken&$filterString";
-    print("User Id:"+userId);
-    print(url);
+
+    final url = "https://bellasareas.firebaseio.com/properties.json";
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;

@@ -1,8 +1,9 @@
-import 'package:bellasareas/exception/http_exception.dart';
-import 'package:bellasareas/main.dart';
 import 'package:bellasareas/provider/auth_provider.dart';
+import 'package:bellasareas/screen/overview_screen.dart';
 import 'package:bellasareas/screen/signup.dart';
 import 'package:bellasareas/utils/custom_clip.dart';
+import 'package:bellasareas/utils/error_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final _form = GlobalKey<FormState>();
   String _email;
   String _password;
@@ -35,37 +37,52 @@ class _LoginState extends State<Login> {
           );
         });
   }
-
-  Future<void> checkLogin() async {
-    _form.currentState.save();
+  Future<void> checkVerification() async{
+    var user = await FirebaseAuth.instance.currentUser();
+    if(user.isEmailVerified){
+      Provider.of<AuthProvider>(context,listen: false).getUserInfo();
+      Provider.of<AuthProvider>(context,listen: false).updateVerification();
+      Navigator.of(context).pushNamedAndRemoveUntil(
+          OverViewScreen.routeName, (Route<dynamic> route) => false);
+    }
+    else if(!user.isEmailVerified){
+      setState(() {
+        _isLoading = false;
+      });
+      showErrorDialog("Verify Your Email Address First");
+    }
+  }
+  Future<void> logIn() async {
     setState(() {
-      _isLoading = true;
+      _isLoading=true;
     });
     try {
-      await Provider.of<Auth>(context, listen: false).logIn(_email, _password);
-      Navigator.of(context).pushReplacementNamed(HomePage.routeName);
-    } on HttpException catch (error) {
-      print(error);
-      var errorMessage = "Authentication Failed";
-      if (error.toString().contains("EMAIL_EXITS")) {
-        errorMessage = 'This email address is already in use.';
-      } else if (error.toString().contains("INVALID_EMAIL")) {
-        errorMessage = 'This is not a valid email address.';
-      } else if (error.toString().contains("WEAK_PASSWORD")) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains("EMAIL_NOT_FOUND")) {
-        errorMessage = "Email address doesn't exists.";
-      } else if (error.toString().contains("INVALID_PASSWORD")) {
-        errorMessage = 'Invalid password.';
-      }
-      showErrorDialog(errorMessage);
+      await _firebaseAuth
+          .signInWithEmailAndPassword(email: _email, password: _password)
+          .then((authResult) {
+        checkVerification();
+      }).catchError((error) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (error.code == "ERROR_USER_NOT_FOUND") {
+          showErrorDialog("Email Address Not Found");
+        }
+        if (error.code == "ERROR_WRONG_PASSWORD") {
+          showErrorDialog("Invalid Password");
+        }
+        return null;
+      });
     } catch (error) {
-      const errorMessage = "Could not Authenticate. Please try again later";
-      showErrorDialog(errorMessage);
+      throw (error);
     }
-    setState(() {
-      _isLoading = false;
-    });
+  }
+  void checkLogin() {
+      _form.currentState.save();
+      if(_email.isEmpty||_password.isEmpty){
+        showErrorDialog("Fill the Form Properly");
+      }
+      logIn();
   }
 
   @override
@@ -189,7 +206,7 @@ class _LoginState extends State<Login> {
                         ),
                         Text(
                           'Do not have account ?',
-                          style: style.CustomTheme.textInputDecoration,
+                          style: style.CustomTheme.kTextGreyStyle,
                         ),
                         GestureDetector(
                           onTap: () {

@@ -15,6 +15,13 @@ class CustomTheme{
       fontSize: 35,
       fontWeight: FontWeight.w600
   );
+  static const TextStyle headerBlackMedium = TextStyle(
+      color: Colors.black,
+      fontFamily: 'Nunito',
+      fontStyle: FontStyle.italic,
+      fontSize: 35,
+      fontWeight: FontWeight.w600
+  );
   static const TextStyle header = TextStyle(
       color: Colors.white,
       fontFamily: 'BalsamiqSans',
@@ -38,8 +45,14 @@ class CustomTheme{
       fontSize: 20,
       fontWeight: FontWeight.w800
   );
-  static const TextStyle secondFont = TextStyle(
+  static const TextStyle kTextBlackStyle = TextStyle(
     color: Colors.black,
+      fontFamily: 'BalsamiqSans',
+      fontSize: 16,
+      fontWeight: FontWeight.w500
+  );
+  static const TextStyle kTextGreyStyle = TextStyle(
+      color: Colors.grey,
       fontFamily: 'BalsamiqSans',
       fontSize: 16,
       fontWeight: FontWeight.w500
@@ -51,6 +64,7 @@ class CustomTheme{
     fontWeight: FontWeight.w700,
   );
   static const Color circularColor1 =  Color(0xff6a1b9a);
+  static const Color iconColor =  Color(0xff4B0082);
   static const purpleGradient = const LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -82,3 +96,4 @@ class CustomTheme{
       offset: Offset(0, 10),
       blurRadius: 20)];
 }
+

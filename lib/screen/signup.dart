@@ -1,27 +1,61 @@
-import 'package:bellasareas/exception/http_exception.dart';
 import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/screen/login.dart';
 import 'package:bellasareas/utils/custom_clip.dart';
+import 'package:bellasareas/utils/error_message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:bellasareas/utils/custom_theme.dart' as style;
 
 class SignUp extends StatefulWidget {
-  static const routeName = "/login_signup";
+  static const routeName = "/signup";
   @override
   _SignUpState createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
+  @override
+  void initState() {
+    super.initState();
+    _getToken();
+  }
+
   final _form = GlobalKey<FormState>();
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   final passwordController = TextEditingController();
   bool _isLoading = false;
-  //-----------Information For Form-----------
   String _email;
   String _password;
   String _name;
   String _contact;
+  String token;
+  void _getToken() {
+    _firebaseMessaging.getToken().then((deviceToken) {
+      token = deviceToken;
+    });
+  }
+
+  Future<void> verification() async {
+    var user = await FirebaseAuth.instance.currentUser();
+    user.sendEmailVerification().then((push) {
+      setState(() {
+        _isLoading = false;
+      });
+      Provider.of<AuthProvider>(context, listen: false).addUserInfo(
+          user.uid,
+          _name,
+          _email,
+          _contact,
+          "https://firebasestorage.googleapis.com/v0/b/confession-ff8df.appspot.com/o/user.png?alt=media&token=7a15f72b-56c4-404a-86a2-94ab6ecb248d",
+          token);
+      Navigator.pushReplacement(context,
+          MaterialPageRoute(builder: (BuildContext context) => Login()));
+    }).catchError((error) {
+      showErrorDialog("An Error Occurred while sending email verification");
+    });
+  }
   void showErrorDialog(String errorDialog) {
     showCupertinoDialog(
         context: context,
@@ -38,10 +72,8 @@ class _SignUpState extends State<SignUp> {
           );
         });
   }
-
   Future<void> signUp() async {
     if (!_form.currentState.validate()) {
-      // Invalid!
       return;
     }
     _form.currentState.save();
@@ -49,40 +81,34 @@ class _SignUpState extends State<SignUp> {
       _isLoading = true;
     });
     try {
-      await Provider.of<Auth>(context, listen: false)
-          .signUp(_email, _password, _contact, _name);
-      Navigator.pop(context);
-    } on HttpException catch (error) {
-      print(error.toString());
-      var errorMessage = "Authentication Failed";
-      if (error.toString().contains("EMAIL_EXITS")) {
-        errorMessage = 'This email address is already in use.';
-      } else if (error.toString().contains("INVALID_EMAIL")) {
-        errorMessage = 'This is not a valid email address.';
-      } else if (error.toString().contains("WEAK_PASSWORD")) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains("EMAIL_NOT_FOUND")) {
-        errorMessage = "Email address doesn't exists.";
-      } else if (error.toString().contains("INVALID_PASSWORD")) {
-        errorMessage = 'Invalid password.';
-      }
-      showErrorDialog(errorMessage);
+      await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: _email, password: _password)
+          .then((authResult) {
+        verification();
+      }).catchError((error) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (error.code == "ERROR_EMAIL_ALREADY_IN_USE") {
+          showErrorDialog("Email is already used.");
+        }
+        return null;
+      });
     } catch (error) {
       throw (error);
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
-          ? Center(child: CircularProgressIndicator(
-        backgroundColor: style.CustomTheme.circularColor1,
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.4)),
-      ))
+          ? Center(
+              child: CircularProgressIndicator(
+              backgroundColor: style.CustomTheme.circularColor1,
+              valueColor:
+                  AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.4)),
+            ))
           : SingleChildScrollView(
               child: Column(
                 children: <Widget>[
@@ -145,8 +171,7 @@ class _SignUpState extends State<SignUp> {
                                     borderRadius: BorderRadius.circular(20),
                                     color: Colors.white,
                                     boxShadow:
-                                      style.CustomTheme.textFieldBoxShadow
-                                    ),
+                                        style.CustomTheme.textFieldBoxShadow),
                                 child: Container(
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 20.0),
@@ -181,8 +206,7 @@ class _SignUpState extends State<SignUp> {
                                     borderRadius: BorderRadius.circular(20),
                                     color: Colors.white,
                                     boxShadow:
-                                      style.CustomTheme.textFieldBoxShadow
-                                    ),
+                                        style.CustomTheme.textFieldBoxShadow),
                                 child: Container(
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 20.0),
@@ -222,8 +246,7 @@ class _SignUpState extends State<SignUp> {
                                     borderRadius: BorderRadius.circular(20),
                                     color: Colors.white,
                                     boxShadow:
-                                      style.CustomTheme.textFieldBoxShadow
-                                    ),
+                                        style.CustomTheme.textFieldBoxShadow),
                                 child: Container(
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 20.0),
@@ -258,8 +281,7 @@ class _SignUpState extends State<SignUp> {
                                     borderRadius: BorderRadius.circular(20),
                                     color: Colors.white,
                                     boxShadow:
-                                      style.CustomTheme.textFieldBoxShadow
-                                    ),
+                                        style.CustomTheme.textFieldBoxShadow),
                                 child: Container(
                                   padding:
                                       EdgeInsets.symmetric(horizontal: 20.0),
@@ -301,8 +323,7 @@ class _SignUpState extends State<SignUp> {
                                     borderRadius: BorderRadius.circular(20),
                                     color: Colors.white,
                                     boxShadow:
-                                      style.CustomTheme.textFieldBoxShadow
-                                    ),
+                                        style.CustomTheme.textFieldBoxShadow),
                                 child: Container(
                                   child: TextFormField(
                                     validator: (value) {
@@ -339,22 +360,13 @@ class _SignUpState extends State<SignUp> {
                             decoration: style.CustomTheme.buttonDecoration,
                             child: Text(
                               'Sign Up',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: style.CustomTheme.buttonFont,
                             ),
                           ),
                         ),
                         Text(
                           'Already have an account!',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                          ),
+                          style: style.CustomTheme.kTextGreyStyle,
                         ),
                         GestureDetector(
                           onTap: () {
@@ -365,14 +377,10 @@ class _SignUpState extends State<SignUp> {
                             margin: EdgeInsets.only(
                                 top: 10, left: 30, right: 30, bottom: 10),
                             height: 40,
-                            decoration:style.CustomTheme.buttonDecoration,
+                            decoration: style.CustomTheme.buttonDecoration,
                             child: Text(
                               'Login',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              style: style.CustomTheme.buttonFont,
                             ),
                           ),
                         ),

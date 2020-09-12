@@ -1,10 +1,14 @@
+import 'package:bellasareas/provider/auth_provider.dart';
 import 'package:bellasareas/provider/property_provider.dart';
-import 'package:bellasareas/screen/wishlist_screen.dart';
-import 'package:bellasareas/widgets/property_grid_view.dart';
+import 'package:bellasareas/screen/drawer_screen.dart';
+import 'package:bellasareas/screen/search_screen.dart';
+import 'package:bellasareas/widgets/overview_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:bellasareas/utils/custom_theme.dart' as style;
+import 'package:shimmer/shimmer.dart';
 
 class OverViewScreen extends StatefulWidget {
   static const routeName = "/overViewScreen";
@@ -13,108 +17,88 @@ class OverViewScreen extends StatefulWidget {
 }
 
 class _OverViewScreenState extends State<OverViewScreen> {
-  double xOffSet = 0;
-  double yOffSet = 0;
-  double scaleFactor = 1;
-  bool isDrawerOpen = false;
-  void openDrawer() {
-    setState(() {
-      xOffSet = 200;
-      yOffSet = 130;
-      scaleFactor = 0.6;
-      isDrawerOpen = true;
-    });
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<AuthProvider>(context, listen: false).getUserInfo();
+    Provider.of<AuthProvider>(context,listen: false).addToPrefs();
   }
-  void closeDrawer() {
-    setState(() {
-      xOffSet = 0;
-      yOffSet = 0;
-      scaleFactor = 1;
-      isDrawerOpen = false;
-    });
-  }
+
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    final deviceHeight =
+        MediaQuery.of(context).size.height;
+    return Container(
       height: MediaQuery.of(context).size.height,
-      transform: Matrix4.translationValues(xOffSet, yOffSet, 0)
-        ..scale(scaleFactor),
-      duration: Duration(milliseconds: 500),
-      decoration: BoxDecoration(
-        gradient: style.CustomTheme.homeGradient,
-        borderRadius: BorderRadius.circular(isDrawerOpen ? 40 : 0.0),
-      ),
-      child: Column(
-        children: <Widget>[
-          SizedBox(height: 30),
-          //Custom App Bar
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-                boxShadow: style.CustomTheme.textFieldBoxShadow,
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(10.0))),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      decoration: BoxDecoration(gradient: style.CustomTheme.homeGradient),
+      child: SafeArea(
+        child: Scaffold(
+          key: _scaffoldKey,
+          drawer: Drawer(
+            child: DrawerScreen(),
+          ),
+          backgroundColor: Colors.transparent,
+          body: SingleChildScrollView(
+            child: Stack(
               children: <Widget>[
-                isDrawerOpen
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.arrow_back_ios,
-                          color: Colors.purple[500],
-                        ),
-                        onPressed: () {
-                          closeDrawer();
-                        },
-                      )
-                    : IconButton(
-                        icon: Icon(
-                          Icons.menu,
-                          color: Colors.purple[500],
-                        ),
-                        onPressed: () {
-                          openDrawer();
-                        },
-                      ),
-                Text(
-                  "Bellas Areas",
-                  style: style.CustomTheme.headerBlack,
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.save,
-                    color: Colors.purple[500],
+                Positioned(
+                  left: 8,
+                  child: IconButton(
+                    icon: Icon(Icons.menu),
+                    onPressed: (){
+                      DrawerScreen();
+                      _scaffoldKey.currentState.openDrawer();
+                    },
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(WishList.routeName);
-                  },
-                )
+                ),
+                Positioned(
+                  top: 2,
+                  right: 8,
+                  child: IconButton(
+                    icon: Icon(Icons.search,size: 30,),
+                    onPressed: (){
+                    Navigator.of(context).pushNamed(SearchScreen.routeName);}
+                  ),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.only(left: 90,top: 20),
+                      height: deviceHeight*0.25- AppBar().preferredSize.height,
+                        child: Text(
+                      "Buy or Sell \n Property",
+                      style: style.CustomTheme.headerBlackMedium,
+                    )),
+                    FutureBuilder(
+                      future:
+                          Provider.of<PropertyProvider>(context, listen: false)
+                              .fetchAndSetProperty(false),
+                      builder: (ctx, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return SizedBox(
+                            child: Shimmer.fromColors(
+                              baseColor: Color(0xffd3d1ff),
+                              highlightColor:Color(0xffba68c8),
+                              child: OverViewItem(),
+                            ),
+                          );
+                        } else {
+                          return OverViewItem();
+                        }
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          SizedBox(
-            height: 10,
-          ),
-          //Body Part
-          Container(
-              height: MediaQuery.of(context).size.height * 0.85,
-              child: FutureBuilder(
-                future: Provider.of<PropertyProvider>(context, listen: false)
-                    .fetchAndSetProperty(),
-                builder: (ctx,snapshot){
-                  if(snapshot.connectionState==ConnectionState.waiting){
-                    return Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: style.CustomTheme.circularColor1,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white.withOpacity(0.4)),
-                        ));
-                  }
-                  else {
-                    return PropertyGridView();
-                  }
-                },
-              )),
-        ],
+        ),
       ),
     );
   }
